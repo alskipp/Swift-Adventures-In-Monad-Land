@@ -56,8 +56,8 @@ On first glance, it would appear that the expression is comparing two **Ints**
     Int < Int
 
 However, this is not the case. The *pet* property is **Optional**, therefore the *age* property must also be **Optional**.
-The consequence of this is that right-hand-side of the expression **(4)** must be *auto-wrapped* into an **Optional**.
-Otherwise the types won't match; Swift *helpfully* wraps the **4** in an **Optional**. The types are actually:
+The consequence of this is that the right-hand-side of the expression **(4)** must be *auto-wrapped* into an **Optional**.
+Otherwise the types won't match; Swift *helpfully* wraps the **4** in an **Optional**. The types of the expression are actually:
 
     Optional<Int> < <Optional<Int>
 
@@ -111,13 +111,29 @@ let p3 = peeps.filter { maybe(false, $0.pet) { $0.age < 4 } }
 println(p3)
 
 /*:
-**One more for *bad* measure**
+**There's more than one way to skin an *Optional***
 
-The final alternative uses both *monadic bind* on **Optional** and the *nil coalescing operator*.
-It does exactly the same thing as the **maybe** function, but with less clarity.
+The next approach uses both *monadic bind* on **Optional** and the *nil coalescing operator*.
+It does exactly the same thing as the **maybe** function, however it's pretty difficult to read.
 The return value of the bind operator is *Optional<Bool>.None* when the *Pet* is *.None*.
-The *nil coalescing operator* **??** unwraps the **Optional** value, or replaces it with the default value *false*.
+The *nil coalescing operator* **??** unwraps the **Optional** value and returns it –
+if there's no associated value to unwrap, it returns the default value, in this case *'false'*.
 */
 let p4 = peeps.filter { ($0.pet >>= { $0.age < 4 }) ?? false }
 println(p4)
 
+/*:
+**Flatten the mapping**
+
+Rather than use the custom bind operator **>>=**, it would probably be better in this instance to use Swift's built-in flatMap function.
+*/
+let p5 = peeps.filter { ($0.pet.flatMap { $0.age < 4 }) ?? false }
+println(p5)
+
+/*:
+**What's flatMap?**
+
+The flatMap function is a recent addition to Swift – its behaviour is the same as the custom bind operator **>>=**.
+
+The next thrilling installment of 'Swift Adventures in Monad Land' will discuss flatMap.
+*/
