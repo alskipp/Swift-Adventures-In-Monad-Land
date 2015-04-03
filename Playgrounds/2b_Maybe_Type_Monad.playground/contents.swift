@@ -11,7 +11,7 @@ Consequently, we need to introduce **monadic bind** to the **Maybe** type (sugar
 
 It will be informative to first declare a top-level *map* function for **Maybe** types.
 You may recall that *map* is already implemented as a method on the **Maybe** type.
-The *map* method uses *self* as an implicit first parameter, whereas the function takes a **Maybe** as a its first parameter.
+The *map* method uses *self* as an implicit first parameter, whereas the function takes a **Maybe** as its first parameter.
 Other than that, the functionality is identical. The reason for declaring *map* as a function is to show how
 similar it is to *monadic bind* – declared below
 */
