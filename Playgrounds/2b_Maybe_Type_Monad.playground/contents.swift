@@ -38,7 +38,9 @@ The **>>=** (bind) operator is very similar to the *map* function, declared abov
 
 The only difference between *map* and *monadic bind* is that the second parameter returns a *Maybe* for the *bind operator*.
 This means that in the *.Some* case the function **f** will return the **Maybe** that is required.
-The return value for *map* needs to be explicitly wrapped in a **Maybe** as the function **f** has the type *A -> B*
+The return value for *map* needs to be explicitly wrapped in a **Maybe** as the function **f** has the type *A -> B*.
+
+Compare the implementation of **map** (above) to **>>=** to see how similar they are.
 */
 infix operator >>= {associativity left}
 func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
@@ -48,6 +50,32 @@ func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
     }
 }
 /*:
+## Why use an infix operator?
+
+There are several techniques that could be used to implement *bind*:
+
+* A method could be added to the **Optional** type (in fact such a method was added in Swift 1.2 – *flatMap*).
+* A named top-level function
+* An infix operator function
+
+When programming in Swift, you're unlikely to use **>>=** that often in the wild, as the preference
+is to use methods over top-level functions and custom operators.
+**>>=** is used here for a couple of reasons. Firstly, both parameters are explicit,
+so it's easier to follow the types of the function.
+(The *flatMap* method on **Optionals** has *self* as an implicit first parameter,
+which makes following the types a bit more difficult).
+
+Secondly, the use of an infix operator is quite elegant when chaining functions together.
+Below is a comparison of chaining several functions together using the different ways of implementing monadic bind:
+
+    value >>= f >>= g >>= h                // infix operator
+    value.flatMap(f).flatMap(g).flatMap(h) // flatMap method
+    bind(bind(bind(value, f), g), h)       // top-level 'bind' function
+
+In certain circumstances an enigmatic infix operator can actually be the easiest to read.
+
+* * *
+
 ## An Example of *Monadic Bind*
 
 To put our binding operator through its paces, let's create a few structs with properties to work on.
