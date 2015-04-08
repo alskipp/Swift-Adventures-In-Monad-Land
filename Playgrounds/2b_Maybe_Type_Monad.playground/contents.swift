@@ -54,8 +54,8 @@ func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
 
 There are several techniques that could be used to implement *bind*:
 
-* A method could be added to the **Optional** type (in fact such a method was added in Swift 1.2 – *flatMap*).
-* A named top-level function
+* A method could be added to the **Optional** type (in fact such a method was added in Swift 1.2 – *flatMap*)
+* A named top-level function (also added in Swift 1.2)
 * An infix operator function
 
 When programming in Swift, you're unlikely to use **>>=** that often in the wild, as the preference
@@ -68,9 +68,9 @@ which makes following the types a bit more difficult).
 Secondly, the use of an infix operator is quite elegant when chaining functions together.
 Below is a comparison of chaining several functions together using the different ways of implementing monadic bind:
 
-    value >>= f >>= g >>= h                // infix operator
-    value.flatMap(f).flatMap(g).flatMap(h) // flatMap method
-    bind(bind(bind(value, f), g), h)       // top-level 'bind' function
+    value >>= f >>= g >>= h                   // infix operator
+    value.flatMap(f).flatMap(g).flatMap(h)    // flatMap method
+    flatMap(flatMap(flatMap(value, f), g), h) // top-level flatMap function
 
 In certain circumstances an enigmatic infix operator can actually be the easiest to read.
 
