@@ -14,7 +14,7 @@ The purpose of this repository is to explore concepts relating to the 'M' word i
 Playgrounds
 ---
 
-NOTE: Xcode 6.3 beta 4 or higher is recommended.
+NOTE: Xcode 6.3 or higher is recommended.
 
 ###### 1a ) I See No Nil
 
