@@ -124,7 +124,7 @@ println(jo_space)
 As a comparison, here's how it would look using the built in Optional type.
 First, we need to declare a new version of the Person struct that has an Optional Residence.
 
-The implemenation should be much more familiar and easier to follow.
+The implementation should be much more familiar and easier to follow.
 Just remember the *Monadic bind* operations you see above in the Maybe type version,
 they're still happening, but concealed beneath the syntax sugar of Optional chaining.
 */
