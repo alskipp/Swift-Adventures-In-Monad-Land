@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:../5a_Threatening_Monad_and_Applicative.playground">
+   </FileRef>
+   <FileRef
+      location = "self:ThreateningMonad.playground">
+   </FileRef>
+</Workspace>
