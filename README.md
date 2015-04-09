@@ -36,12 +36,15 @@ The monad is revealed.
 
 When Optionals go Bad!
 
+###### 4a) Three Binds are Better than One
 
-Playgrounds Under Construction:
----
+**🚧 Playground still under construction 👷** 
 
-* Three Binds Are Better Than One
-* Threatening Monad
+###### 5a) Threatening Monad
+
+Beginners guide to managing an oppressive surveillance state.
+
+* * *
 
 So, what is a ‘Monad’ anyway? (Don't expect a straight answer)
 ---
