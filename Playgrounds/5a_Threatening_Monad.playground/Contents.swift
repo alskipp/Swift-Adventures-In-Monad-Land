@@ -344,7 +344,7 @@ let mergedGroupA = map(safeGroup) { s in s + dangerGroup.value }
 println(mergedGroupA)
 
 /*:
-Well that's no use. Having merged a group of low risk people with a bunch of dangerous psychkillers and jugglers,
+Well that's no use. Having merged a group of low risk people with a bunch of dangerous psychokillers and jugglers,
 we've ended up with a **ThreatLevel** of **Low**; society will crumble. What went wrong?
 
 Using the **map** function seems sensible, it allows us to perform a transformation function while maintaining the **ThreatLevel**.
