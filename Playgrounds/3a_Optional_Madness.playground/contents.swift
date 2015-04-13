@@ -93,9 +93,9 @@ which is used in case the value of the *second parameter* is **Optional.None**. 
 It is similar to *map* for *Optionals*, but the *default parameter* allows the return value to be a non-optional value.
 */
 
-func maybe<A,B>(@autoclosure fallback:() -> B, opt:A?, @noescape f:A -> B) -> B {
+func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:A?, @noescape f:A -> B) -> B {
     switch opt {
-    case .None : return fallback()
+    case .None : return defaultValue()
     case .Some(let x) : return f(x)
     }
 }
@@ -136,4 +136,70 @@ println(p5)
 The flatMap function is a recent addition to Swift – its behaviour is the same as the custom bind operator **>>=**.
 
 The next thrilling installment of 'Swift Adventures in Monad Land' will discuss flatMap.
+
+* * *
+
+## A brief look at the **Maybe** type
+
+Out of interest, what would the implementation look like using the custom **Maybe** type instead of **Optionals**?
+To find out, let's create a **Person** struct with a **Maybe<Pet>** property.
+(What is certain is that the same bug won't occur, because unlike **Optionals**, 
+the **Maybe** type does not support automatic wrapping of values).
 */
+struct Person2 {
+    let name:String
+    let pet:Maybe<Pet> // pet property is Pet wrapped in a Maybe
+}
+
+extension Person2 : Printable {
+    var description: String {
+        switch pet {
+        case .Some(let p) : return "\(name) has a Pet aged: \(p.age)"
+        default : return "\(name) has no pet"
+        }
+    }
+}
+//: create an array of people, this time with **Maybe<Pet>** properties
+let peeps2 = [Person2(name: "Fred", pet:Maybe(Pet(age: 10))),
+              Person2(name: "Jane", pet:Maybe(Pet(age: 1))),
+              Person2(name: "Eric", pet:.None)]
+/*:
+A first attempt at filtering the Array might be as follows:
+
+    peeps2.filter { $0.pet >>= { pure($0.age < 4) } }
+
+This seems like a reasonable approach, but it doesn't work. 
+The reason is because the return type of the closure passed to filter is incorrect.
+**filter** expects a closure with a return type of **Bool**.
+
+    { $0.pet >>= { pure($0.age < 4) } }
+
+The return type of the above closure is **Maybe<Bool>**. 
+The **pure** function is responsible for *lifting* the return value of the closure into the **Maybe** type.
+Well, that's easy to fix; just dispense with the **pure** function and return a plain **Bool**.
+Not so fast, that won't work either, because the bind operator **>>=** expects a return type of **Maybe<T>**, not **Bool**.
+
+**Argh**, looks like we're consigned to purgatory.
+
+A desperate technique to escape from type-checking purgatory would look like this:
+
+    peeps2.filter { switch $0.pet {
+        case .Some(let pet) : return pet.age < 4
+        case .None : return false
+        }
+    }
+
+That would work, but it's ugly as hell – which is where we're destined for writing code like that. 
+Thankfully, there's a way to avoid it and it requires the **maybe** function – this time implemented for the **Maybe** type.
+*/
+func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:Maybe<A>, @noescape f:A -> B) -> B {
+    switch opt {
+    case .None : return defaultValue()
+    case .Some(let x) : return f(x)
+    }
+}
+//: By using the **maybe** function, the filter expression can be implemented in a reasonaby sane fashion:
+let p6 = peeps2.filter { maybe(false, $0.pet) { $0.age < 4 } }
+
+println("People who own pets, younger than 4 years old:\n\n\(p6)")
+
