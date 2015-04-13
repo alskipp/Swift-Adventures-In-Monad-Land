@@ -198,7 +198,7 @@ func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:Maybe<A>, @noescape f:A -
     case .Some(let x) : return f(x)
     }
 }
-//: By using the **maybe** function, the filter expression can be implemented in a reasonaby sane fashion:
+//: By using the **maybe** function, the filter expression can be implemented in a reasonably sane fashion:
 let p6 = peeps2.filter { maybe(false, $0.pet) { $0.age < 4 } }
 
 println("People who own pets, younger than 4 years old:\n\n\(p6)")
