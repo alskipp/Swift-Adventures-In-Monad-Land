@@ -72,7 +72,7 @@ Nothing magical there. If a type conforms to the **NilLiteralConvertible** proto
 which can produce a default value of the type. The *init* method receives one argument containing no useful information 
 (it is merely the *empty tuple*). It is therefore impossible to derive any information from the
 argument (it's simply a stand-in for *nil*) and a *default* value must be returned from the method. 
-Here's an example of how the **Optional** type can confrom to the **NilLiteralConvertible** protocol:
+Here's an example of how the **Optional** type can conform to the **NilLiteralConvertible** protocol:
 
     enum Optional<T> : NilLiteralConvertible {
         init(nilLiteral: ()) {
@@ -150,10 +150,7 @@ Whereas the following is acceptable:
 
 ## Is *nil* less than zero?
 
-Need to talk about comparing two Optionals, auto-wrapping/lifting, can't compare an Optional to a non-optional value
-
-
-
+You might expect **nil** to be equal to zero. Well is it?
 */
 nil < 0
 /*:
