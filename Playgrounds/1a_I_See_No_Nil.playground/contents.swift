@@ -134,6 +134,8 @@ Also, just like assigning **.None** to a variable, it's perfectly valid (and arg
 let g = "hello".toInt()
 g != .None
 
+let h = "42".toInt()
+h != .None
 /*:
 When a variable is declared as an **Optional** it is possible to assign a *non-optional* value to the variable.
 The *non-optional* value will be automatically wrapped in an **Optional**.
@@ -153,6 +155,7 @@ Whereas the following is acceptable:
 You might expect **nil** to be equal to zero. Well is it?
 */
 nil < 0
+
 /*:
 **It turns out that *nil* is less than zero. How can this be?**
 
@@ -162,6 +165,7 @@ What we really have is:
     .None < 0
 */
 .None < 0
+
 /*:
 The question is: What type of **.None** is it? It's an **Optional**, 
 but an **Optional** must have an associated type. In this instance
@@ -170,6 +174,7 @@ the only sensible type is **Int**. Therefore **.None** can be expanded to:
     Optional<Int>.None < 0
 */
 Optional<Int>.None < 0
+
 /*:
 We've fully expanded the type of **nil**, but there's another problem to address.
 How can the **<** operator be used to compare *values* of different *types*?
@@ -206,8 +211,8 @@ To give the most explicit and verbose form:
 
     Optional<Int>.None < Optional<Int>.Some(0)
 */
-
 Optional<Int>.None < Optional<Int>.Some(0)
+
 /*:
 The seemingly simple expression:
 
@@ -235,9 +240,10 @@ And that is why **nil < 0** is true.
 
 The same logic applies to all **Comparable** types. Here's an example with **String**:
 */
-
 "a" > nil
+
 "a" > .None
+
 Optional<String>.Some("a") > Optional<String>.None
 
 /*:
