@@ -29,7 +29,7 @@ extension 🍌 : NilLiteralConvertible {
 let b = 🍌()
 println(b)
 /*:
-## We are now entering the *Twighlight Zone*
+## We are now entering the *Twilight Zone*
 
 **Things start getting peculiar when we compare a *Banana* to *nil***
 */
@@ -48,7 +48,7 @@ This is what is evaluated:
 */
 🍌() == 🍌() // true (obviously)
 /*:
-**I can sense your scepticism!**
+**I can sense your skepticism!**
 
 Maybe if a **Banana** is created from **nil** you'll be convinced?
 */
@@ -71,7 +71,7 @@ println(bananaBox)
 
 Well, it isn't actually. It's quite obvious when you think about it.
 **Banana** is *NilLiteralConvertible*, therefore, Swift will happily replace all instances of **nil**
-with a **Banana**, as long as the type checker is satisified. You can't, for example, assign **nil**
+with a **Banana**, as long as the type checker is satisfied. You can't, for example, assign **nil**
 to a variable without type annotations and expect it to become a **Banana**:
 
     let b = nil // will not compile and will not become a Banana!
