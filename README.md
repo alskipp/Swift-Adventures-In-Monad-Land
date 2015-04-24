@@ -38,9 +38,13 @@ When Optionals go Bad!
 
 ###### 4a) Three Binds are Better than One
 
-**🚧 Playground still under construction 👷** 
+You're looking for one Optional bind, then three turn up at once.
 
-###### 5a) Threatening Monad
+###### 5a) flatMap for Array
+
+**TODO:** Why should Optionals get all the fun?
+
+###### 6a) Threatening Monad
 
 Beginners guide to managing an oppressive surveillance state.
 
