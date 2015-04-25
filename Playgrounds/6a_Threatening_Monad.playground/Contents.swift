@@ -15,7 +15,7 @@ The purpose of this Playground is to demonstrate a novel way of representing **t
 ### **ThreatLevel** enum
 
 An **enum** that represents the various threat levels.
-It has an **Int** rawValue to make it easy to implement the **Equatable** & **Comparable** protocols.
+It has an **Int** rawValue to make it easy to implement the **Comparable** protocol.
 */
 enum ThreatLevel : Int, Printable {
     case Low = 0, Guarded, Elevated, High, Severe
@@ -30,23 +30,19 @@ enum ThreatLevel : Int, Printable {
         }
     }
 }
-
-func ==(lhs:ThreatLevel, rhs:ThreatLevel) -> Bool {
-    return lhs.rawValue == rhs.rawValue
-}
-
-func <(lhs:ThreatLevel, rhs:ThreatLevel) -> Bool {
-    return lhs.rawValue < rhs.rawValue
-}
 /*:
 ### **Equatable** & **Comparable** protocols
 
-Having implemented the two operators '**==**' & '**<**'
-the **ThreatLevel** can now be extended with the **Equatable** & **Comparable** protocols.
-As a result, the other comparison operators (such as **!=, >, <=**, etc) will be available
-to use along with **min** and **max** functions.
+Enums without associated values are **Hashable** by default, which means they are also **Equatable** by default.
+To make the **ThreatLevel** enum **Comparable**, all that is required is to implement the **<** operator
+and declare protocol conformance with an **extension**. As a result, the other comparison operators 
+(such as **>, <=**, etc) will be available to use along with the **min** and **max** functions.
 */
-extension ThreatLevel : Equatable, Comparable {}
+func <(lhs:ThreatLevel, rhs:ThreatLevel) -> Bool {
+    return lhs.rawValue < rhs.rawValue
+}
+
+extension ThreatLevel : Comparable {}
 /*:
 ### **Threat** struct (Monad)
 
