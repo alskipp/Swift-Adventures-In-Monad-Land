@@ -9,7 +9,7 @@ Answer: No.
 
 But it's an interesting topic nonetheless and if you tinker with Swift enough you'll find yourself doing monadic things, perhaps without realising.
 
-The purpose of this repository is to explore concepts relating to the 'M' word in Swift. The ideas are developed from talks I gave at [Swift London Meetup](http://www.meetup.com/swiftlondon/) and [Swift Summit](https://www.swiftsummit.com) and are presented as Xcode Playground files.
+The purpose of this repository is to explore concepts relating to the 'M' word in Swift. The ideas are developed from talks I gave at [Swift London Meetup](http://www.meetup.com/swiftlondon/) and [Swift Summit](https://www.swiftsummit.com) and are presented as Xcode Playground files. The video of my Swift London talk (Swift and Nothingness) can be found [here.](https://skillsmatter.com/skillscasts/6203-swift-and-nothingness)
 
 Playgrounds
 ---
