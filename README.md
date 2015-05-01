@@ -42,7 +42,11 @@ You're looking for one Optional bind, then three turn up at once.
 
 ###### 5a) flatMap for Array
 
-**TODO:** Why should Optionals get all the fun?
+Monadic stocktaking for squirrels using curried functions.
+
+###### 5b) More Squirrel antics
+
+**TODO** Advanced flatMap operations for squirrels.
 
 ###### 6a) Threatening Monad
 
