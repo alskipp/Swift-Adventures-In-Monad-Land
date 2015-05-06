@@ -44,9 +44,13 @@ You're looking for one Optional bind, then three turn up at once.
 
 Monadic stocktaking for squirrels using curried functions.
 
-###### 5b) More Squirrel antics
+###### 5b) More flatMap for Squirrels
 
-**TODO** Advanced flatMap operations for squirrels.
+Squirrels, flatMap and the ‘beaky’ operator |>.
+
+###### 5c) Last of the Squirrels
+
+**TODO** Squirrels, flatMap and function composition.
 
 ###### 6a) Threatening Monad
 
