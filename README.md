@@ -16,45 +16,95 @@ Playgrounds
 
 NOTE: Xcode 6.3.1 or higher is recommended.
 
-###### 1a ) I See No Nil
+### 1a ) I See No Nil
 
 The weird world of nil in Swift.
 
-###### 1b) Going Bananas
+```swift
+nil < 0
+True
+```
+
+### 1b) Going Bananas
 
 A cautionary tale about self-generating Swift bananas.
 
-###### 2a) Maybe Type
+```swift
+let banana:🍌 = nil
+🍌
+```
+
+### 2a) Maybe Type
 
 How to implement the Optional type.
 
-###### 2b) Maybe Type Monad
+```swift
+enum Maybe<T> : NilLiteralConvertible {
+    case None
+    case Some(T)
+}
+```
+
+### 2b) Maybe Type Monad
 
 The monad is revealed.
 
-###### 3a) Optional Madness
+```swift
+func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
+    switch m {
+    case .None : return .None
+    case .Some(let m) : return f(m)
+    }
+}
+```
+
+### 3a) Optional Madness
 
 When Optionals go Bad!
 
-###### 4a) Three Binds are Better than One
+```swift
+peeps.filter { $0.pet?.age < 4 }
+// non-existent pets are < 4
+```
+
+### 4a) Three Binds are Better than One
 
 You're looking for one Optional bind, then three turn up at once.
 
-###### 5a) flatMap for Array
+```swift
+>>=
+?
+if let
+flatMap
+```
+
+### 5a) flatMap for Array
 
 Monadic stocktaking for squirrels using curried functions.
 
-###### 5b) More flatMap for Squirrels
+```swift
+squirrels.flatMap(nutsOfType(.Hazel)).count
+```
+
+### 5b) More flatMap for Squirrels
 
 Squirrels, flatMap and the ‘beaky’ operator |>.
 
-###### 5c) Last of the Squirrels
+```swift
+squirrels |> minBy { $0.caches.map(distance) |> minElement }
+```
+
+### 5c) Last of the Squirrels
 
 **TODO** Squirrels, flatMap and function composition.
 
-###### 6a) Threatening Monad
+### 6a) Threatening Monad
 
 Beginners guide to managing an oppressive surveillance state.
+
+```swift
+safeGroup >>= addPerson(Person(name: "Gideon", occupation: "MP", threat: .Elevated))
+```
 
 * * *
 
