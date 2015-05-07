@@ -241,8 +241,8 @@ If an empty **Array** is passed to the function the return value will be **.None
 * * *
 
 Use **first** to take the first element of the supplied **Array**. The return value of **first** is an **Optional**.
-Therefore use **map** on the return result - if the **Array** was empty the whole expression will return **.None**.
-If the **Array** isn't empty then call the normal **reduce** function using the first element as the initail value.
+Therefore use **map** on the return value of **first** - if the **Array** is empty the whole expression will return **.None**.
+If the **Array** isn't empty the normal **reduce** function will be called using the first element as the initial value.
 */
 func reduce1<A>(f:(A,A) -> A)(_ xs:[A]) -> A? {
     return first(xs).map { x in
@@ -251,6 +251,7 @@ func reduce1<A>(f:(A,A) -> A)(_ xs:[A]) -> A? {
 }
 
 [1,2,3,4] |> reduce1(*) // yay, it works
+
 /*:
 ### **minBy** & **maxBy** functions
 
