@@ -69,7 +69,7 @@ peeps.filter { $0.pet?.age < 4 }
 
 ### 4a) Three Binds are Better than One
 
-You're looking for one Optional bind, then three turn up at once.(With a side helping of JSON parsing).
+You're looking for one Optional bind, then three turn up at once. (With a side helping of JSON parsing).
 
 ```swift
 >>=
