@@ -115,8 +115,6 @@ func >>= <A,B> (t: Threat<A>, @noescape f: A -> Threat<B>) -> Threat<B> {
     return Threat(max(t.threat, t2.threat), t2.value)
 }
 /*:
-* * *
-
 **A simple example of Threat struct** – Make a dangerous number
 */
 let n = Threat(.High, 666)
