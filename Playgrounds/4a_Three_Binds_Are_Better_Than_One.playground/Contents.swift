@@ -164,9 +164,65 @@ extension Character {
 first(str)?.toString().toInt()
 
 /*:
-* * *
+## **A practical example with JSON**
 
-That was a brief exploration of how monadic bind for **Optionals** manifests itself in various forms in Swift.
+Everyone's favourite/most feared, Swift task is parsing JSON ; )
+
+If you take a look in the **Resources** folder and the **Sources** folder of the Playground file,
+you'll find a snippet of JSON and a function **JSONFromFile** (which has a return type of **AnyObject?**).
+There's also a **Person struct** defined, which will be used as the data type for the JSON file.
+
+The first thing to do is to define a **typealias** to represent a JSON dictionary and then load the JSON from a file,
+using the **JSONFromFile** function.
+*/
+typealias JSON = [String:AnyObject]
+let json: AnyObject? = JSONFromFile("person")
+/*:
+The next task is to parse the JSON data and initialize a **Person**.
+To do so, we can define a function that takes an **Optional<AnyObject>** and returns an **<Optional<Person>**.
+Using **if let**, it's possible to cast the **Optional<AnyObject>** to **JSON** and bind to a variable **j**.
+
+We can then subscript into **j** within the **if let** statement to access the JSON values
+(casting to the correct type as we do so). As later bindings depend upon the previous variable **j**, this is a monadic bind operation.
+Finally, if the **if let** statement succeeds, create and return the **Person** type, otherwise, return **.None**.
+*/
+func parseJSON(json:AnyObject?) -> Person? {
+  if let j = json as? JSON,
+         name = j["name"] as? String,
+         job = j["job"] as? String,
+         year_of_birth = j["year_of_birth"] as? Int
+  {
+    return Person(name:name, job:job, birthYear:year_of_birth)
+  } else {
+    return .None
+  }
+}
+/*:
+Now to parse some JSON:
+*/
+let person = parseJSON(json)
+println(person)
+
+/*:
+## Throwing down the functional gauntlet
+
+As a final teaser. Here's how the same parsing can be achieved using a more functional approach.
+Take a look in the **Sources** folder to see how **create** and <*> are implemented.
+The series of operations is very similar to the **if let** example above, it's the use of function currying,
+that allows it to be expressed more succinctly.
+The **j** variable is bound using the bind operator **>>=**, the variable is then used within the closure 
+to subscript into the JSON dictionary, building up the **person** struct one parameter at a time.
+*/
+let person2: Person? = json as? JSON >>= { j in
+  Person.create <*> (j["name"] as? String)
+                <*> (j["job"] as? String)
+                <*> (j["year_of_birth"] as? Int)
+}
+println(person2)
+
+/*:
+That was a brief exploration of how monadic bind for **Optionals** manifests itself in various forms in Swift,
+with a helping of JSON parsing to finish things off.
 
 Next time: **flatMap** with **Array**.
 */
