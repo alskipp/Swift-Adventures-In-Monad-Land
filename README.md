@@ -63,8 +63,8 @@ func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
 When Optionals go Bad!
 
 ```swift
-peeps.filter { $0.pet?.age < 4 }
-// non-existent pets are < 4
+people.filter { person in person.pet?.age < 4 }
+// non-existent pets are younger than 4?!
 ```
 
 ### 4a) Three Binds are Better than One
@@ -83,7 +83,7 @@ flatMap
 Monadic stocktaking for squirrels using curried functions.
 
 ```swift
-squirrels.flatMap(nutsOfType(.Hazel)).count
+countOfHazelNuts = squirrels.flatMap(nutsOfType(.Hazel)).count
 ```
 
 ### 5b) More flatMap for Squirrels
@@ -91,7 +91,8 @@ squirrels.flatMap(nutsOfType(.Hazel)).count
 Squirrels, flatMap and the ‘beaky’ operator |>.
 
 ```swift
-squirrels |> minBy { $0.caches.map(distance) |> minElement }
+squirrelWithNearestCache = squirrels 
+                        |> minBy { $0.caches.map(distance) |> minElement }
 ```
 
 ### 5c) Last of the Squirrels
