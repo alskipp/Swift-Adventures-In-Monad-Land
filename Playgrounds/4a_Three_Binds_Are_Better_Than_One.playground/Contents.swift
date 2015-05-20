@@ -221,8 +221,15 @@ let person2: Person? = json as? JSON >>= { j in
 println(person2)
 
 /*:
-That was a brief exploration of how monadic bind for **Optionals** manifests itself in various forms in Swift,
-with a helping of JSON parsing to finish things off.
+This JSON parsing technique can be developed even further, to find out more, 
+take a look at the **[Argo](https://github.com/thoughtbot/Argo)** library on GitHub.
+
+* * *
+
+### Thats all, for now…
+
+This Playground explored how monadic bind for **Optionals** manifests itself in various forms in Swift
+and finished off with a side helping of JSON parsing as a practical example.
 
 Next time: **flatMap** with **Array**.
 */
