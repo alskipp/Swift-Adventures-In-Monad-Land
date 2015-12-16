@@ -3,14 +3,14 @@ import Foundation
 public func JSONFromFile(file: String) -> AnyObject? {
   return NSBundle.mainBundle().pathForResource(file, ofType: "json").flatMap { p in
     NSData(contentsOfFile: p).flatMap { data in
-      NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil)
+      try! NSJSONSerialization.JSONObjectWithData(data, options: [])
     }
   }
 }
 
 
 
-public struct Person: Printable {
+public struct Person: CustomStringConvertible {
   let name: String, job: String, birthYear: Int
   
   public init(name:String, job:String, birthYear:Int) {
