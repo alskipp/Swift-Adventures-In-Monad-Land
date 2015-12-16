@@ -128,13 +128,13 @@ let f:[Int]? = [1,2,3]
 f != nil
 /*:
 If the types can be inferred, explicit type declarations are not required.
-The **toInt()** function returns an **Optional<Int>**.
+The **Int()** initializer with a String argument returns an **Optional<Int>**.
 Also, just like assigning **.None** to a variable, it's perfectly valid (and arguably clearer) to test for equality with **.None**
 */
-let g = "hello".toInt()
+let g = Int("hello")
 g != .None
 
-let h = "42".toInt()
+let h: Int? = Int("42")
 h != .None
 /*:
 When a variable is declared as an **Optional** it is possible to assign a *non-optional* value to the variable.
@@ -164,7 +164,7 @@ What we really have is:
 
     .None < 0
 */
-.None < 0
+(.None) < 0
 
 /*:
 The question is: What type of **.None** is it? It's an **Optional**, 
