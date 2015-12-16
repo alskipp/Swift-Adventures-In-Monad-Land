@@ -325,7 +325,7 @@ func curry<A,B,C>(f:(A,B) -> C) -> A -> B -> C {
 
 extension Squirrel: CustomStringConvertible {
     var description: String {
-		let cachesString = caches.map { $0.description } |> { $0.joinWithSeparator("\n") }
+		let cachesString = caches.map { $0.description } |> curry({ $1.joinWithSeparator($0) })("\n")
         
         return "\(name)\n\(cachesString)"
     }
