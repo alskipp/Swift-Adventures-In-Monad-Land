@@ -161,7 +161,7 @@ func distance(cache:Cache) -> Float {
 /*:
 It should now be an easy task to take an **Array** of **Squirrels** and calculate the distance to the closest **Cache**.
 */
-let closestCacheDistance = squirrels.flatMap { $0.caches }.map(distance).minElement()
+let closestCacheDistance = squirrels.flatMap { $0.caches }.map(distance).minElement()!
 print("Distance to closest Cache: \(closestCacheDistance)m")
 
 /*:
@@ -190,14 +190,14 @@ The **minElement** function can now be applied at the end of the expresssion.
 let closestCacheDistance2 = squirrels
                            .flatMap { $0.caches }
                            .map(distance)
-                           |> { $0.minElement() }
+                           |> { $0.minElement()! }
 
 print("Distance to closest Cache: \(closestCacheDistance2)m")
 
 let mostNuts = squirrels
               .flatMap { $0.caches }
               .map {$0.nuts.count}
-              |> { $0.maxElement() }
+              |> { $0.maxElement()! }
 
 print("Number of nuts in biggest cache: \(mostNuts)")
 
@@ -325,7 +325,7 @@ func curry<A,B,C>(f:(A,B) -> C) -> A -> B -> C {
 
 extension Squirrel: CustomStringConvertible {
     var description: String {
-		let cachesString = caches.map { $0.description } |> curry({ $1.joinWithSeparator($0) })("\n")
+		let cachesString = caches.map { $0.description } |> { $0.joinWithSeparator("\n") }
         
         return "\(name)\n\(cachesString)"
     }
@@ -348,6 +348,10 @@ print("Squirrel with most acorns: \n\(acornHunter)")
 let mostCaches = squirrels |> maxBy { $0.caches.count }
 
 print("Squirrel with most Caches: \n\(mostCaches)")
+
+let closest = squirrels |> minBy { $0.caches.map(distance) |> { $0.minElement()! } }
+
+print("Squirrel with closest Cache: \n\(closest)")
 /*:
 ### **Next time:**
 
