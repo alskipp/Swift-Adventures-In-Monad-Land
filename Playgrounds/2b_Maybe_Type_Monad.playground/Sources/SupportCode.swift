@@ -13,7 +13,7 @@ public enum Maybe<T> : NilLiteralConvertible {
     }
 }
 
-extension Maybe : Printable {
+extension Maybe : CustomStringConvertible {
     public var description: String {
         switch self {
         case .None : return "{None}"

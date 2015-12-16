@@ -21,9 +21,9 @@ func map<A,B>(m: Maybe<A>, f: A -> B) -> Maybe<B> {
     case .Some(let x) : return .Some(f(x))
     }
 }
-//: An example of using *map* with a *Maybe<Array>* and passing the *sorted* function as second parameter
-let n = map(Maybe([3,2,5,1,4]), sorted)
-println(n)
+//: An example of using *map* with a *Maybe<Array>* and passing a closure using the *sort* function as second parameter
+let n = map(Maybe([3,2,5,1,4]), f: { $0.sort() })
+print(n)
 //: *Lift* plain values into the **Maybe** type. It's the explicit equivalent of *implicit Optional wrapping*.
 func pure<A>(x:A) -> Maybe<A> {
     return Maybe(x)
@@ -114,10 +114,10 @@ func livingSpace(person:Maybe<Person>) -> Maybe<Int> {
 }
 //: Call *livingSpace* function with a *Maybe<Person>*
 let bob_space = livingSpace(Maybe(bob))
-println(bob_space) // Bob has no residence, therefore the return value will be .None
+print(bob_space) // Bob has no residence, therefore the return value will be .None
 //: Call *livingSpace* function with a *Maybe<Person>*
 let jo_space = livingSpace(Maybe(jo))
-println(jo_space)
+print(jo_space)
 /*:
 ## Using the *Optional* type
 
