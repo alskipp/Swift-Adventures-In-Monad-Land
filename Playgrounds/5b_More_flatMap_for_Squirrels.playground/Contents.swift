@@ -4,7 +4,7 @@
 The previous Playground introduced **flatMap** for **Array** using calculations involving **Squirrels**.
 We're not finished with the **Squirrels**, **Nuts** and **Caches** just yet, so here they are:
 */
-enum Nut: Printable {
+enum Nut: CustomStringConvertible {
     case Acorn, Hazel, Chestnut, Cashew
     
     var description: String { // boring boilerplate
@@ -92,10 +92,10 @@ The use of top-level curried functions enabled us to write succinct and elegant 
 Here are a couple of examples from last time:
 */
 let allChestnuts = squirrels.flatMap(nutsOfType(.Chestnut))
-println(allChestnuts)
+print(allChestnuts)
 
 let acornCount = squirrels.flatMap(nutsOfType(.Acorn)).count
-println("Number of acorns: \(acornCount)")
+print("Number of acorns: \(acornCount)")
 
 /*:
 **More stocktaking calculations with Squirrels**
@@ -106,7 +106,7 @@ But first, Swift doesn't have built-in functions for **sum** and **average**, so
 They'll be very useful.
 */
 func sum(x:[Int]) -> Int {
-    return reduce(x, 0, +)
+    return x.reduce(0, combine: +)
 }
 
 func average(x:[Int]) -> Float {
@@ -127,9 +127,9 @@ All of the above questions will require the use of **flatMap**.
 
 * * *
 
-Let's extend the **Cache** type to conform to the *Printable* protocol.
+Let's extend the **Cache** type to conform to the *CustomStringConvertible* protocol.
 */
-extension Cache: Printable {
+extension Cache: CustomStringConvertible {
     func countNutsOfType(nut:Nut) -> Int {
         return self.nuts.filter { $0 == nut }.count
     }
@@ -161,8 +161,8 @@ func distance(cache:Cache) -> Float {
 /*:
 It should now be an easy task to take an **Array** of **Squirrels** and calculate the distance to the closest **Cache**.
 */
-let closestCacheDistance = minElement(squirrels.flatMap { $0.caches }.map(distance))
-println("Distance to closest Cache: \(closestCacheDistance)m")
+let closestCacheDistance = squirrels.flatMap { $0.caches }.map(distance).minElement()
+print("Distance to closest Cache: \(closestCacheDistance)m")
 
 /*:
 There's a distinct problem here. The answer is correct, but the code is lacking clarity.
@@ -190,23 +190,23 @@ The **minElement** function can now be applied at the end of the expresssion.
 let closestCacheDistance2 = squirrels
                            .flatMap { $0.caches }
                            .map(distance)
-                           |> minElement
+                           |> { $0.minElement() }
 
-println("Distance to closest Cache: \(closestCacheDistance2)m")
+print("Distance to closest Cache: \(closestCacheDistance2)m")
 
 let mostNuts = squirrels
               .flatMap { $0.caches }
               .map {$0.nuts.count}
-              |> maxElement
+              |> { $0.maxElement() }
 
-println("Number of nuts in biggest cache: \(mostNuts)")
+print("Number of nuts in biggest cache: \(mostNuts)")
 
 let avgNuts = squirrels
              .flatMap { $0.caches }
              .map {$0.nuts.count}
              |> average
 
-println("Average number of nuts in cache: \(avgNuts)")
+print("Average number of nuts in cache: \(avgNuts)")
 
 let allCals = squirrels
              .flatMap { $0.caches }
@@ -214,19 +214,19 @@ let allCals = squirrels
              .map(calories)
              |> sum
 
-println("Total calories in caches: \(allCals)")
+print("Total calories in caches: \(allCals)")
 
 let hazelWithin50m = squirrels
                     .flatMap { $0.caches }
-                    .filter { distance($0) < 50 && contains($0.nuts, .Hazel) }
+                    .filter { distance($0) < 50 && $0.nuts.contains(.Hazel) }
 
-println("Hazel nuts within 50m: \n\(hazelWithin50m)")
+print("Hazel nuts within 50m: \n\(hazelWithin50m)")
 
 let noChestnuts = squirrels
                  .flatMap { $0.caches }
                  .filter { ($0 |> nutsOfType(.Chestnut)).count == 0 }
 
-println("Caches containing no Chestnuts: \n\(noChestnuts)")
+print("Caches containing no Chestnuts: \n\(noChestnuts)")
 
 /*:
 ### **reduce1** function
@@ -245,8 +245,8 @@ Therefore use **map** on the return value of **first** - if the **Array** is emp
 If the **Array** isn't empty the normal **reduce** function will be called using the first element as the initial value.
 */
 func reduce1<A>(f:(A,A) -> A)(_ xs:[A]) -> A? {
-    return first(xs).map { x in
-        reduce(xs[1..<xs.endIndex], x, f)
+    return xs.first.map { x in
+        xs[1..<xs.endIndex].reduce(x, combine: f)
     }
 }
 
@@ -272,32 +272,32 @@ let closestCache = squirrels
                   .flatMap { $0.caches }
                   |> minBy(distance)
 
-println("Closest Cache: \n\(closestCache)")
+print("Closest Cache: \n\(closestCache)")
 
 let paltryCache = squirrels
                  .flatMap { $0.caches }
                  |> minBy { $0.nuts.count }
 
-println("Cache containing fewest nuts: \n\(paltryCache)")
+print("Cache containing fewest nuts: \n\(paltryCache)")
 
 let mostCals = squirrels
               .flatMap { $0.caches }
               |> maxBy { $0.nuts.map(calories) |> sum }
 
-println("Cache with most calories: \n\(mostCals)")
+print("Cache with most calories: \n\(mostCals)")
 
 let abundantHazels = squirrels
                     .flatMap { $0.caches }
-                    |> maxBy { $0 |> nutsOfType(.Hazel) |> count }
+                    |> maxBy { $0 |> nutsOfType(.Hazel) |> { $0.count } }
 
-println("Cache containing most Hazels: \n\(abundantHazels)")
+print("Cache containing most Hazels: \n\(abundantHazels)")
 
 let closestAcorns = squirrels
                    .flatMap { $0.caches }
                    .filter { ($0 |> nutsOfType(.Acorn)).count > 0 }
                    |> minBy(distance)
 
-println("Nearest cache containing Acorns: \n\(closestAcorns)")
+print("Nearest cache containing Acorns: \n\(closestAcorns)")
 
 /*:
 ## **Squirrel Ranking**
@@ -316,16 +316,16 @@ All these questions and more can be answered by combining the functions we've cr
 
 * * *
 
-First, let's extend **Squirrel** to be **Printable**.
-The **curry** function below is used to curry the **join** function when constructing a *description* **String**.
+First, let's extend **Squirrel** to be **CustomStringConvertible**.
+The **curry** function below is used to curry the **joinWithSeparator** function when constructing a *description* **String**.
 */
 func curry<A,B,C>(f:(A,B) -> C) -> A -> B -> C {
     return { a in { b in f(a,b) } }
 }
 
-extension Squirrel: Printable {
+extension Squirrel: CustomStringConvertible {
     var description: String {
-        let cachesString = caches.map { $0.description } |> curry(join)("\n")
+		let cachesString = caches.map { $0.description } |> curry({ $1.joinWithSeparator($0) })("\n")
         
         return "\(name)\n\(cachesString)"
     }
@@ -333,26 +333,21 @@ extension Squirrel: Printable {
 /*:
 Now we can finally interrogate some squirrels to see who is pulling their weight.
 */
-let topSquirrel = squirrels |> maxBy { $0.nuts |> count }
+let topSquirrel = squirrels |> maxBy { $0.nuts |> { $0.count } }
 
-println("Top nut gatherer: \n\(topSquirrel)")
+print("Top nut gatherer: \n\(topSquirrel)")
 
-let lazySquirrel = squirrels |> minBy { $0.nuts |> count }
+let lazySquirrel = squirrels |> minBy { $0.nuts |> { $0.count } }
 
-println("Laziest squirrel: \n\(lazySquirrel)")
+print("Laziest squirrel: \n\(lazySquirrel)")
 
-let acornHunter = squirrels |> maxBy { $0 |> nutsOfType(.Acorn) |> count }
+let acornHunter = squirrels |> maxBy { $0 |> nutsOfType(.Acorn) |> { $0.count } }
 
-println("Squirrel with most acorns: \n\(acornHunter)")
+print("Squirrel with most acorns: \n\(acornHunter)")
 
 let mostCaches = squirrels |> maxBy { $0.caches.count }
 
-println("Squirrel with most Caches: \n\(mostCaches)")
-
-let closest = squirrels |> minBy { $0.caches.map(distance) |> minElement }
-
-println("Squirrel with closest Cache: \n\(closest)")
-
+print("Squirrel with most Caches: \n\(mostCaches)")
 /*:
 ### **Next time:**
 
