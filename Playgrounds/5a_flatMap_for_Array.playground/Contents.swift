@@ -25,14 +25,14 @@ alternatively, we could use a mutable **Array** and update it within a loop, or 
 */
 infix operator >>= {associativity left}
 func >>= <A,B>(x: [A], f: A -> [B]) -> [B] {
-    return reduce(x, []) { result, item in result + f(item) }
+    return x.reduce([]) { result, item in result + f(item) }
 }
 /*:
 Here's a simple test to show that the function works as expected.
 For every **Int** in an **Array**, return an **Array** containing the **Int** and its successor.
 */
 let successors = [1,10,50,100] >>= { [$0, $0+1] }
-println(successors)
+print(successors)
 
 /*:
 **The flatMap method**
@@ -53,7 +53,7 @@ A problem involving performing calculations on **Arrays**, what better way than�
 
 This particular problem will obviousy require nuts. Here we go:
 */
-enum Nut: Printable {
+enum Nut: CustomStringConvertible {
     case Acorn, Hazel, Chestnut, Cashew
     
     var description: String { // boring boilerplate
@@ -133,14 +133,14 @@ for sqrl in squirrels {
         }
     }
 }
-println(nuts)
+print(nuts)
 
 /*:
 This works as expected, but the same result can be acheived without the need of a mutable **Array**.
 The first tool to reach for when replacing loops and mutable vars with a functional approach is **map**.
 */
 let nutsMap = squirrels.map { sqrl in sqrl.caches.map { cache in cache.nuts } }
-println(nutsMap)
+print(nutsMap)
 
 /*:
 Using the **map** function doesn't give the most helpful result.
@@ -149,7 +149,7 @@ What's really required is a flattened **Array** containing all the **Nuts**.
 A perfect use case for **flatMap**:
 */
 let nuts1 = squirrels.flatMap { sqrl in sqrl.caches }.flatMap { cache in cache.nuts }
-println(nuts1)
+print(nuts1)
 
 /*:
 That's the result we wanted, though it would be better if some of the procedure was abstracted away to simplify the operation.
@@ -164,7 +164,7 @@ extension Squirrel {
 Now we can gather all the **Nuts** from all the **Squirrels** a little easier:
 */
 let nuts2 = squirrels.flatMap { sqrl in sqrl.nuts }
-println(nuts2)
+print(nuts2)
 
 /*:
 An alternative approach would be to add a top-level function that serves the same purpose.
@@ -174,7 +174,7 @@ func nuts(squirrel:Squirrel) -> [Nut] {
 }
 
 let nuts3 = squirrels.flatMap(nuts)
-println(nuts3)
+print(nuts3)
 
 /*:
 That last example is a little simpler because a top-level function can be passed directly to **flatMap**.
@@ -206,15 +206,15 @@ Let's put this new functionality through its paces.
 We can now ask a **Squirrel** to return **Nuts** of a specific type:
 */
 let chestnuts = jane.nutsOfType(.Chestnut)
-println(chestnuts)
+print(chestnuts)
 
 //: By using **flatMap**, it's easy to return all the **Nuts** of a specific type from every **Squirrel**:
 let allChestnuts = squirrels.flatMap { $0.nutsOfType(.Chestnut) }
-println(allChestnuts)
+print(allChestnuts)
 
 //: To return the number of **Nuts** rather than the **Nuts** themselves, simply **count** the return value:
 let acornCount = squirrels.flatMap { $0.nutsOfType(.Acorn) }.count
-println("Number of acorns: \(acornCount)")
+print("Number of acorns: \(acornCount)")
 
 /*:
 Just as it was possible to define the **nuts** function as a top-level function as opposed to a method/computed value,
@@ -224,8 +224,8 @@ func nutsOfType(squirrel:Squirrel, nut:Nut) -> [Nut] {
     return nuts(squirrel).filter { $0 == nut }
 }
 
-let acornCount2 = squirrels.flatMap { nutsOfType($0, .Acorn) }.count
-println("Number of acorns: \(acornCount2)")
+let acornCount2 = squirrels.flatMap { nutsOfType($0, nut: .Acorn) }.count
+print("Number of acorns: \(acornCount2)")
 
 /*:
 That worked, but it's actually more verbose and uglier than using a **computed property** on the **Squirrel** struct.
@@ -256,7 +256,7 @@ Which means that previously supplied arguments are captured within the context o
 When the final argument is received, the whole expression can be evaluated, as if all the arguments were given together.
 */
 let fredsAcorns = acornsOnly(squirrel: fred)
-println("Fred’s Acorns: \n\(fredsAcorns)")
+print("Fred’s Acorns: \n\(fredsAcorns)")
 
 /*:
 It should now be clearer why the order of the parameters to the **nutsOfType** function were flipped.
@@ -264,13 +264,13 @@ It means we can create a partially applied function, then let **flatMap** supply
 For example, here's how to use **flatMap** with the **acornsOnly** function:
 */
 let acornCount3 = squirrels.flatMap(acornsOnly).count
-println("Number of acorns: \(acornCount3)")
+print("Number of acorns: \(acornCount3)")
 
 /*:
 It is not necessary to create a new named function for use with **flatMap**, the curried function can simply be partially applied in place.
 */
 let acornCount4 = squirrels.flatMap(nutsOfType(.Acorn)).count
-println("Number of acorns: \(acornCount4)")
+print("Number of acorns: \(acornCount4)")
 
 /*:
 ### **method/function comparison**
