@@ -46,8 +46,8 @@ enum Maybe<T> : NilLiteralConvertible {
         }
     }
 }
-//: Extend **Maybe** with the *Printable* protocol
-extension Maybe : Printable {
+//: Extend **Maybe** with the *CustomStringConvertible* protocol
+extension Maybe : CustomStringConvertible {
     var description: String {
         switch self {
         case .None : return "{None}"
@@ -94,13 +94,13 @@ func > <T: Comparable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
 initializing **Maybe** without an arg requires a type declaration
 */
 let m = Maybe<Int>()
-println(m)
+print(m)
 //: initializing Maybe with an arg – the type is inferred from the arg
 let m1 = Maybe(1)
-println(m1)
+print(m1)
 //: map func returns a new **Maybe**
 let m2 = m1.map { $0 + 1 }
-println(m2)
+print(m2)
 //: Comparing **Maybe** types
 m1 == m2 // Maybe(1) == Maybe(2)
 m1 < m2 // Maybe(1) < Maybe(2)
@@ -177,7 +177,7 @@ case .Some(let d) :
     }
 }
 
-println(v)
+print(v)
 
 /*:
 ## **Ouch!**
