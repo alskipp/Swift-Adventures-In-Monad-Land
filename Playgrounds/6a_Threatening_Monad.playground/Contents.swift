@@ -38,7 +38,7 @@ To make the **ThreatLevel** enum **Comparable**, all that is required is to impl
 and declare protocol conformance with an **extension**. As a result, the other comparison operators 
 (such as **>, <=**, etc) will be available to use along with the **min** and **max** functions.
 */
-func <(lhs:ThreatLevel, rhs:ThreatLevel) -> Bool {
+func <(lhs: ThreatLevel, rhs: ThreatLevel) -> Bool {
     return lhs.rawValue < rhs.rawValue
 }
 
@@ -55,10 +55,10 @@ or by implementing the bind operator **>>=**. The bind operator will add less no
 so that's the route which will be taken here.
 */
 struct Threat<T> : CustomStringConvertible {
-    let threat:ThreatLevel
+    let threat: ThreatLevel
     let value: T
     
-    init(_ t:ThreatLevel, _ x:T) {
+    init(_ t: ThreatLevel, _ x: T) {
         threat = t
         value = x
     }
@@ -68,11 +68,11 @@ struct Threat<T> : CustomStringConvertible {
     }
 }
 //: **map** - makes it possible to apply functions to the value inside the **Threat** struct
-func map<A,B>(x:Threat<A>, f: A -> B) -> Threat<B> {
+func map<A,B>(x: Threat<A>, f: A -> B) -> Threat<B> {
     return Threat(x.threat, f(x.value))
 }
 //: **Monadic 'return'** - default level is **Low**
-func pure<T>(x:T) -> Threat<T> {
+func pure<T>(x: T) -> Threat<T> {
     return Threat(.Low, x)
 }
 /*:
@@ -144,11 +144,11 @@ To be clear, **ThreatLevel** is just a simple *enum*, it is not a monad
 (the monad is the **Threat** struct – it is not used within the **Person** struct).
 */
 struct Person : CustomStringConvertible {
-    let name:String
-    let occupation:String
-    let threat:ThreatLevel
+    let name: String
+    let occupation: String
+    let threat: ThreatLevel
     
-    init(name:String, occupation:String, threat:ThreatLevel = .Low) {
+    init(name: String, occupation: String, threat: ThreatLevel = .Low) {
         self.name = name
         self.occupation = occupation
         self.threat = threat
@@ -193,7 +193,7 @@ A **Threat<[Person]>** struct needs to be intialized with two parameters, a **Th
 The first parameter is taken directly from the supplied **Person** by accessing their **threat** property 
 and the second parameter is the result of adding the **Person** to the supplied **Array**.
 */
-func addPerson(person:Person)(_ list:[Person]) -> Threat<[Person]> {
+func addPerson(person: Person)(_ list: [Person]) -> Threat<[Person]> {
     return Threat(person.threat, list + [person])
 }
 /*:
@@ -370,14 +370,14 @@ If we were using Haskell, this function would be available to use for any monadi
 Unfortunately it is not (yet) possible to inform Swift's type system that a particular type is monadic,
 which means that we need to manually create the following function for every monadic type : (
 */
-func liftM<A,B>(m1:Threat<A>, m2:Threat<A>, @noescape f:(A,A) -> B) -> Threat<B> {
+func liftM<A,B>(m1: Threat<A>, _ m2: Threat<A>, @noescape f: (A,A) -> B) -> Threat<B> {
     return m1 >>= { x in m2 >>= { pure(f(x, $0)) } }
 }
 /*:
 The **liftM** function allows us to apply a *normal* function to two monadic values and to get a monadic value back in return.
 This means we can now add two groups of people wrapped up in **Threat** monads very simply:
 */
-let mergedGroupC = liftM(safeGroup, m2: dangerGroup, f: +)
+let mergedGroupC = liftM(safeGroup, dangerGroup, f: +)
 print(mergedGroupC)
 
 /*:
