@@ -52,14 +52,14 @@ This is what is evaluated:
 
 Maybe if a **Banana** is created from **nil** you'll be convinced?
 */
-let banana:🍌 = nil
+let banana: 🍌 = nil
 print(banana)
 /*:
 **That's nothing! Let's create a whole box of *Bananas* from thin air**
 
 First, we need an empty box of **Bananas**
 */
-var bananaBox:[🍌] = []
+var bananaBox: [🍌] = []
 //: Now let's add nothing to the box 100 times
 for b in 1...100 {
     bananaBox.append(nil)
