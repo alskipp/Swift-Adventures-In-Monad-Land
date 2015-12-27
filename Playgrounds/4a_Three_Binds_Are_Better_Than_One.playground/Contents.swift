@@ -124,10 +124,16 @@ dict[1].flatMap { $0[2] }
 /*:
 ### *Optional chaining* is *usually* the right choice
 
-But here's a contrived example where *Optional chaining* is unable to work.
+But here's a contrived example where *Optional chaining* is unable to work. For this we define a **toInt()** method in an extension to String.
+*/
 
-* * *
+extension String {
+  func toInt() -> Int? {
+    return Int(self)
+  }
+}
 
+/*:
 Given a **String** take the first character and convert it to an **Int**.
 (Taking the first character and converting to an **Int** are both operations that return an **Optional**.)
 
@@ -143,11 +149,11 @@ Below are examples of how to solve the task:
 */
 let str = "7-X-Y-Z"
 
-first(str).flatMap { String($0).toInt() }
+str.characters.first.flatMap { String($0).toInt() }
 
-first(str) >>= { String($0).toInt() }
+str.characters.first >>= { String($0).toInt() }
 
-if let c = first(str), i = String(c).toInt() {
+if let c = str.characters.first, i = String(c).toInt() {
     i
 }
 /*:
@@ -161,7 +167,7 @@ extension Character {
     }
 }
 
-first(str)?.toString().toInt()
+str.characters.first?.toString().toInt()
 
 /*:
 ## **A practical example with JSON**
@@ -201,7 +207,7 @@ func parseJSON(json:AnyObject?) -> Person? {
 Now to parse some JSON:
 */
 let person = parseJSON(json)
-println(person)
+print(person)
 
 /*:
 ## Throwing down the functional gauntlet
@@ -218,7 +224,7 @@ let person2: Person? = json as? JSON >>= { j in
                 <*> (j["job"] as? String)
                 <*> (j["year_of_birth"] as? Int)
 }
-println(person2)
+print(person2)
 
 /*:
 This JSON parsing technique can be developed even further, to find out more, 

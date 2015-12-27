@@ -50,8 +50,8 @@ public func optToString<T>(v: T?) -> String {
     let value = "\(v.self)"
 
     if value != "nil" {
-        let v = split(value) { $0 == "(" || $0 == ")" }
-        return "<\(type)>.Some(".join(v) + ")"
+        let v = value.characters.split { $0 == "(" || $0 == ")" }.map(String.init)
+        return v.joinWithSeparator("<\(type)>.Some(") + ")"
     }
     return "Optional<\(type)>.None"
 }

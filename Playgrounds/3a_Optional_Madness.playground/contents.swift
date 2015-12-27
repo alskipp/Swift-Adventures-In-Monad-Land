@@ -14,8 +14,8 @@ struct Person {
     let name:String
     let pet:Pet? // pet property is Optional
 }
-//: make **Person** *Printable*
-extension Person :Printable {
+//: make **Person** *CustomStringConvertible*
+extension Person: CustomStringConvertible {
     var description: String {
         if let p = pet {
             return "\(name) has a Pet aged: \(p.age)"
@@ -40,7 +40,7 @@ We would expect our *Array* to contain only *Jane* as the *age* of her **Pet** i
 *Fred’s* **Pet** is too old and *Eric* doesn't own a **Pet** so he shouldn't be included in the return results.
 */
 let p = peeps.filter { $0.pet?.age < 4 }
-println("People who own pets, younger than 4 years old:\n\n\(p)")
+print("People who own pets, younger than 4 years old:\n\n\(p)")
 
 /*:
 ## What Just Happened!?
@@ -82,7 +82,7 @@ let p2 = peeps.filter {
     }
     return false
 }
-println(p2)
+print(p2)
 
 /*:
 **Another Alternative**
@@ -107,8 +107,8 @@ Call *filter*, then inside the closure, call *maybe* with a default of *false* a
 Finally, pass a closure as the final argument to **maybe**.
 The return value of the expression is the expected value.
 */
-let p3 = peeps.filter { maybe(false, $0.pet) { $0.age < 4 } }
-println(p3)
+let p3 = peeps.filter { maybe(false, opt: $0.pet) { $0.age < 4 } }
+print(p3)
 
 /*:
 **There's more than one way to skin an *Optional***
@@ -120,7 +120,7 @@ The *nil coalescing operator* **??** unwraps the **Optional** value and returns 
 if there's no associated value to unwrap, it returns the default value, in this case *'false'*.
 */
 let p4 = peeps.filter { ($0.pet >>= { $0.age < 4 }) ?? false }
-println(p4)
+print(p4)
 
 /*:
 **Flatten the mapping**
@@ -128,7 +128,7 @@ println(p4)
 Rather than use the custom bind operator **>>=**, it would probably be better in this instance to use Swift's built-in flatMap function.
 */
 let p5 = peeps.filter { ($0.pet.flatMap { $0.age < 4 }) ?? false }
-println(p5)
+print(p5)
 
 /*:
 **What's flatMap?**
@@ -151,7 +151,7 @@ struct Person2 {
     let pet:Maybe<Pet> // pet property is Pet wrapped in a Maybe
 }
 
-extension Person2 : Printable {
+extension Person2 : CustomStringConvertible {
     var description: String {
         switch pet {
         case .Some(let p) : return "\(name) has a Pet aged: \(p.age)"
@@ -199,7 +199,7 @@ func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:Maybe<A>, @noescape f:A -
     }
 }
 //: By using the **maybe** function, the filter expression can be implemented in a reasonably sane fashion:
-let p6 = peeps2.filter { maybe(false, $0.pet) { $0.age < 4 } }
+let p6 = peeps2.filter { maybe(false, opt: $0.pet) { $0.age < 4 } }
 
-println("People who own pets, younger than 4 years old:\n\n\(p6)")
+print("People who own pets, younger than 4 years old:\n\n\(p6)")
 

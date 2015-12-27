@@ -17,7 +17,7 @@ The purpose of this Playground is to demonstrate a novel way of representing **t
 An **enum** that represents the various threat levels.
 It has an **Int** rawValue to make it easy to implement the **Comparable** protocol.
 */
-enum ThreatLevel : Int, Printable {
+enum ThreatLevel : Int, CustomStringConvertible {
     case Low = 0, Guarded, Elevated, High, Severe
     
     var description: String {
@@ -54,7 +54,7 @@ The monadic functionality can be added by implementing a **flatMap** method,
 or by implementing the bind operator **>>=**. The bind operator will add less noise when chaining functions together,
 so that's the route which will be taken here.
 */
-struct Threat<T> : Printable {
+struct Threat<T> : CustomStringConvertible {
     let threat:ThreatLevel
     let value: T
     
@@ -118,11 +118,11 @@ func >>= <A,B> (t: Threat<A>, @noescape f: A -> Threat<B>) -> Threat<B> {
 **A simple example of Threat struct** – Make a dangerous number
 */
 let n = Threat(.High, 666)
-println(n)
+print(n)
 
 //:**Apply a function to the dangerous number** – the **ThreatLevel** is preserved
 let n2 = map(n) { $0 * 2 }
-println(n2)
+print(n2)
 
 /*:
 That example was instructive, but not too interesting.
@@ -143,7 +143,7 @@ they can be given an appropriate **ThreatLevel** when initialized.
 To be clear, **ThreatLevel** is just a simple *enum*, it is not a monad
 (the monad is the **Threat** struct – it is not used within the **Person** struct).
 */
-struct Person : Printable {
+struct Person : CustomStringConvertible {
     let name:String
     let occupation:String
     let threat:ThreatLevel
@@ -155,7 +155,7 @@ struct Person : Printable {
     }
     
     // ThreatLevel will be displayed as a single letter abbreviation to reduce clutter
-    var description: String { return "\(name) (\(occupation)) : \(first(threat.description)!)" }
+    var description: String { return "\(name) (\(occupation)) : \(threat.description.characters.first!)" }
 }
 /*:
 ## Risk Assessment
@@ -234,7 +234,7 @@ Quite simply call the function with the first parameter (**Person**),
 The return value of the expression will be **Threat<[Person]>**.
 */
 let mediumRisk = addPerson(Person(name: "Bob", occupation: "Wrestler", threat: .Elevated))([])
-println(mediumRisk)
+print(mediumRisk)
 
 /*:
 #### **Adding a *Person* to a pre-populated list – *the wrong way***
@@ -249,7 +249,7 @@ and passing it as the second argument to the **addPerson** function.
 This time we'll add a less dangerous **Person** to the list, an Artist with a **Low ThreatLevel**.
 */
 let mellow = addPerson(Person(name: "Jeff", occupation: "Artist", threat: .Low))(mediumRisk.value)
-println(mellow)
+print(mellow)
 
 /*:
 The return value is another **Threat<[Person]>** struct. As the last person added was deemed low risk,
@@ -266,7 +266,7 @@ is preserved when returning the new value.
 #### **Adding a *Person* to a pre-populated list – *the correct way***
 */
 let correct = mediumRisk >>= addPerson(Person(name: "Jeff", occupation: "Artist", threat: .Low))
-println(correct)
+print(correct)
 
 /*:
 This time we get the correct response. How did that work?
@@ -296,13 +296,13 @@ let safeGroup = addPerson(Person(name: "Iris", occupation: "Author"))([])
             >>= addPerson(Person(name: "Mark", occupation: "Botanist"))
             >>= addPerson(Person(name: "Valentina", occupation: "Cosmonaut"))
 
-println(safeGroup)
+print(safeGroup)
 
 /*:
 Now let's add a dubious character to the safeGroup to see what the result is:
 */
 let dodgy = safeGroup >>= addPerson(Person(name: "Gideon", occupation: "MP", threat: .Elevated))
-println(dodgy)
+print(dodgy)
 
 /*:
 As expected by adding one dubious individual (with an **Elevated ThreatLevel**) to the group,
@@ -319,7 +319,7 @@ let dangerGroup = addPerson(Person(name: "Jean", occupation: "Thief", threat: .G
               >>= addPerson(Person(name: "Beth", occupation: "PsychoKiller", threat: .High))
               >>= addPerson(Person(name: "Ada", occupation: "Programmer")) // threat: .Low
 
-println(dangerGroup)
+print(dangerGroup)
 
 /*:
 ## Tracking group allegiances
@@ -335,7 +335,7 @@ Well the logic is simple, maintain the highest **ThreatLevel** when one group jo
 **Adding two groups of people – *the wrong way***
 */
 let mergedGroupA = map(safeGroup) { s in s + dangerGroup.value }
-println(mergedGroupA)
+print(mergedGroupA)
 
 /*:
 Well that's no use. Having merged a group of low risk people with a bunch of dangerous psychokillers and jugglers,
@@ -352,7 +352,7 @@ of the second group is not taken into consideration.
 **Adding two groups of people – *the right way***
 */
 let  mergedGroupB = safeGroup >>= { s in dangerGroup >>= { d in pure(s + d) } }
-println(mergedGroupB)
+print(mergedGroupB)
 
 /*:
 That gave the correct result, but the code looks a little scary. What's happening?
@@ -377,8 +377,8 @@ func liftM<A,B>(m1:Threat<A>, m2:Threat<A>, @noescape f:(A,A) -> B) -> Threat<B>
 The **liftM** function allows us to apply a *normal* function to two monadic values and to get a monadic value back in return.
 This means we can now add two groups of people wrapped up in **Threat** monads very simply:
 */
-let mergedGroupC = liftM(safeGroup, dangerGroup, +)
-println(mergedGroupC)
+let mergedGroupC = liftM(safeGroup, m2: dangerGroup, f: +)
+print(mergedGroupC)
 
 /*:
 ### **Tea Time**

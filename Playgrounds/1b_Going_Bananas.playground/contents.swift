@@ -13,8 +13,8 @@ A **Banana** *enum* with one case is neither useful nor dangerous.
 enum 🍌 {
     case 🍌
 }
-//: Make our **Banana** *Printable*
-extension 🍌 : Printable {
+//: Make our **Banana** *CustomStringConvertible*
+extension 🍌 : CustomStringConvertible {
     var description: String { return "🍌" } // these bananas are all identical
 }
 /*:
@@ -27,7 +27,7 @@ extension 🍌 : NilLiteralConvertible {
 }
 //: Let's create a **Banana** – nothing too interesting yet
 let b = 🍌()
-println(b)
+print(b)
 /*:
 ## We are now entering the *Twilight Zone*
 
@@ -53,7 +53,7 @@ This is what is evaluated:
 Maybe if a **Banana** is created from **nil** you'll be convinced?
 */
 let banana:🍌 = nil
-println(banana)
+print(banana)
 /*:
 **That's nothing! Let's create a whole box of *Bananas* from thin air**
 
@@ -64,7 +64,7 @@ var bananaBox:[🍌] = []
 for b in 1...100 {
     bananaBox.append(nil)
 }
-println(bananaBox)
+print(bananaBox)
 
 /*: 
 ## **Now that's magic!**

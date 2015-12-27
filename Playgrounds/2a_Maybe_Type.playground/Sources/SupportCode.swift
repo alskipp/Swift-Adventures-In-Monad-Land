@@ -13,13 +13,13 @@ public enum Maybe<T> : NilLiteralConvertible {
 The implementation of MaybeDictionary is adapted from http://airspeedvelocity.net
 */
 
-public struct MaybeDictionary<Key: Hashable, Value> {
+public struct MaybeDictionary<Key: Hashable, Value>: DictionaryLiteralConvertible {
     public typealias Element = (Key, Value)
     private typealias Storage = [Element]
     private var _store: Storage = []
     
     private func _indexForKey(key: Key) -> Storage.Index? {
-        for (idx, (k, _)) in zip(indices(_store),_store) {
+        for (idx, (k, _)) in zip(_store.indices,_store) {
             if key == k { return idx }
         }
         return nil
@@ -49,10 +49,8 @@ public struct MaybeDictionary<Key: Hashable, Value> {
             }
         }
     }
-}
 
-extension MaybeDictionary: DictionaryLiteralConvertible {
-    public init(dictionaryLiteral elements: (Key, Value)...) {
+	public init(dictionaryLiteral elements: (Key, Value)...) {
         for (k,v) in elements {
             self[k] = Maybe(v)
         }
