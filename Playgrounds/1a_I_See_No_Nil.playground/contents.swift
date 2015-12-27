@@ -48,13 +48,13 @@ The question is, what is the type of **nil**?
 
 Note: **Int?** is just short-hand for **Optional<Int>**.
 */
-let a:Int? = nil
+let a: Int? = nil
 optToString(a)
 
-let b:String? = nil
+let b: String? = nil
 optToString(b)
 
-let c:Bool? = nil
+let c: Bool? = nil
 optToString(c)
 
 /*:
@@ -96,10 +96,10 @@ In fact, the result is exactly the same and it is also immediately clear that an
 consequently, the expression does not need to be squeezed through the **NilLiteralConvertible** sausage machine.
 */
 
-let a1:Int? = .None
+let a1: Int? = .None
 optToString(a1)
 
-let b1:String? = .None
+let b1: String? = .None
 optToString(b)
 
 /*:
@@ -117,14 +117,14 @@ it is **Optional<T>.None** (where **T** is an actual type, such as *Int*, *Strin
 **Note:** *if let* syntax and the *map* function should be preferred over explicit **‘nil’** checking.
 */
 
-let d:Int? = 1
+let d: Int? = 1
 d != nil
 
 //: If the **Optional** init method is used, explicit type declarations are not required.
 let e = Optional("Hello")
 e != nil
 
-let f:[Int]? = [1,2,3]
+let f: [Int]? = [1,2,3]
 f != nil
 /*:
 If the types can be inferred, explicit type declarations are not required.
@@ -247,16 +247,6 @@ The same logic applies to all **Comparable** types. Here's an example with **Str
 Optional<String>.Some("a") > Optional<String>.None
 
 /*:
-Try that expression the other way around and things don't go so well
-
-    nil < "a" // error: '(NilLiteralConvertible, UnicodeScalarLiteralConvertible)' is not convertible to 'NilLiteralConvertible'
-
-Swift's type inference struggles to make sense of the expression. However the following works as expected:
-
-    .None < "a" // true
-
-Just goes to show that being explicit by using **.None** instead of **nil** can be beneficial.
-
 * * *
 
 That's the end of this expedition into the heart of darkness of **nil**, **NilLiteralConvertible** and **Optional** values.
