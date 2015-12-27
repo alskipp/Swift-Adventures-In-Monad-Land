@@ -156,13 +156,13 @@ when *subscripting* is used. **Warning: *MaybeDictionary* is for demonstration p
 Here we have an example of a nested **MaybeDictionary**.
 */
 
-let mDict:MaybeDictionary = [1:[2:[3:"Hello!"]]]
+let mDict: MaybeDictionary = [1:[2:[3:"Hello!"]]]
 /*:
 Now the difficulty arises: how do we subscript into the nested *Dictionary* to retrieve the final value?
 
 *Optional chaining syntax* only works for **Optionals**, so we must resort to a more brute force approach.
 */
-let v:Maybe<String>
+let v: Maybe<String>
 
 switch mDict[1] {
 case .None : v = .None

@@ -19,7 +19,7 @@ public struct MaybeDictionary<Key: Hashable, Value>: DictionaryLiteralConvertibl
     private var _store: Storage = []
     
     private func _indexForKey(key: Key) -> Storage.Index? {
-        for (idx, (k, _)) in zip(_store.indices,_store) {
+        for (idx, (k, _)) in zip(_store.indices, _store) {
             if key == k { return idx }
         }
         return nil

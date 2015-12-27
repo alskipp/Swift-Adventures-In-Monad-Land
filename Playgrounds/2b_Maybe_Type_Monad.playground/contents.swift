@@ -15,17 +15,17 @@ The *map* method uses *self* as an implicit first parameter, whereas the functio
 Other than that, the functionality is identical. The reason for declaring *map* as a function is to show how
 similar it is to *monadic bind* – declared below
 */
-func map<A,B>(m: Maybe<A>, f: A -> B) -> Maybe<B> {
+func map<A,B>(m: Maybe<A>, _ f: A -> B) -> Maybe<B> {
     switch m {
     case .None : return .None
     case .Some(let x) : return .Some(f(x))
     }
 }
 //: An example of using *map* with a *Maybe<Array>* and passing a closure using the *sort* function as second parameter
-let n = map(Maybe([3,2,5,1,4]), f: { $0.sort() })
+let n = map(Maybe([3,2,5,1,4])) { $0.sort() }
 print(n)
 //: *Lift* plain values into the **Maybe** type. It's the explicit equivalent of *implicit Optional wrapping*.
-func pure<A>(x:A) -> Maybe<A> {
+func pure<A>(x: A) -> Maybe<A> {
     return Maybe(x)
 }
 /*:
@@ -42,7 +42,7 @@ The return value for *map* needs to be explicitly wrapped in a **Maybe** as the 
 
 Compare the implementation of **map** (above) to **>>=** to see how similar they are.
 */
-infix operator >>= {associativity left}
+infix operator >>= { associativity left }
 func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
     switch m {
     case .None : return .None
@@ -89,9 +89,9 @@ that calculates the livingspace of a **Person**. The return value of this functi
 will be *Maybe<Int>*, because a **Person** may not have a **Residence**.
 */
 
-struct Room { let length:Int, width:Int }
-struct Residence { let rooms:[Room] }
-struct Person { let name:String, residence:Maybe<Residence>}
+struct Room { let length: Int, width: Int }
+struct Residence { let rooms: [Room] }
+struct Person { let name: String, residence: Maybe<Residence> }
 //:Create two people: one without a residence and one with a residence
 let bob = Person(name: "Bob", residence: .None)
 let jo = Person(name: "Jo",
@@ -108,9 +108,9 @@ The use of *switch statements* would add verbosity and remove clarity.
 
 Notice that the *pure* function is used to lift the return value into the **Maybe** type.
 */
-func livingSpace(person:Maybe<Person>) -> Maybe<Int> {
+func livingSpace(person: Maybe<Person>) -> Maybe<Int> {
     return person >>= { $0.residence }
-                  >>= { pure($0.rooms.map {$0.length * $0.width }.reduce(0, combine:+)) }
+                  >>= { pure($0.rooms.map { $0.length * $0.width }.reduce(0, combine: +)) }
 }
 //: Call *livingSpace* function with a *Maybe<Person>*
 let bob_space = livingSpace(Maybe(bob))
@@ -129,7 +129,7 @@ Just remember the *Monadic bind* operations you see above in the Maybe type vers
 they're still happening, but concealed beneath the syntax sugar of Optional chaining.
 */
 
-struct Person2 { let name:String, residence:Residence?}
+struct Person2 { let name: String, residence: Residence?}
 
 let jed = Person2(name: "Jed", residence: .None)
 let fi = Person2(name: "Fi", residence: Residence(rooms: [Room(length: 4, width: 3), Room(length: 2, width: 2)]))
@@ -139,8 +139,8 @@ A function that takes a *Optional<Person>* and returns their 'livingspace' as an
 Values passed to the function will be automatically *lifted* into the *Optional* type.
 This differs from our custom *Maybe* type, where auto-lifting does not occur.
 */
-func livingSpace(person:Person2?) -> Int? {
-    return person?.residence?.rooms.map {$0.length * $0.width }.reduce(0, combine:+)
+func livingSpace(person: Person2?) -> Int? {
+    return person?.residence?.rooms.map {$0.length * $0.width }.reduce(0, combine: +)
 }
 //: The parameter to *livingSpace* is declared *Optional*, but we can pass a non-Optional value
 let jed_space = livingSpace(jed) // nil (Or to be precise .None)
