@@ -8,15 +8,15 @@ To demonstrate this, we'll use a **Pet** struct that has one property *age*.
 The *pet* property is **Optional**, as not all people will own a **Pet**.
 */
 
-struct Pet { let age:Int }
+struct Pet { let age: Int }
 
 struct Person {
-    let name:String
-    let pet:Pet? // pet property is Optional
+    let name: String
+    let pet: Pet? // pet property is Optional
 }
 //: make **Person** *CustomStringConvertible*
-extension Person: CustomStringConvertible {
-    var description: String {
+extension Person : CustomStringConvertible {
+    var description : String {
         if let p = pet {
             return "\(name) has a Pet aged: \(p.age)"
         }
@@ -28,9 +28,9 @@ extension Person: CustomStringConvertible {
 
 All people have a name and they may, or may not own a **Pet**
 */
-let peeps = [Person(name: "Fred", pet:Pet(age: 10)),
-             Person(name: "Jane", pet:Pet(age: 1)),
-             Person(name: "Eric", pet:.None)]
+let peeps = [Person(name: "Fred", pet: Pet(age: 10)),
+             Person(name: "Jane", pet: Pet(age: 1)),
+             Person(name: "Eric", pet: .None)]
 
 /*:
 **The Problem**
@@ -93,7 +93,7 @@ which is used in case the value of the *second parameter* is **Optional.None**. 
 It is similar to *map* for *Optionals*, but the *default parameter* allows the return value to be a non-optional value.
 */
 
-func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:A?, @noescape f:A -> B) -> B {
+func maybe<A,B>(opt: A?, @autoclosure defaultValue: () -> B, @noescape f: A -> B) -> B {
     switch opt {
     case .None : return defaultValue()
     case .Some(let x) : return f(x)
@@ -107,38 +107,23 @@ Call *filter*, then inside the closure, call *maybe* with a default of *false* a
 Finally, pass a closure as the final argument to **maybe**.
 The return value of the expression is the expected value.
 */
-let p3 = peeps.filter { maybe(false, opt: $0.pet) { $0.age < 4 } }
+let p3 = peeps.filter { maybe($0.pet, defaultValue: false) { $0.age < 4 } }
 print(p3)
 
 /*:
 **There's more than one way to skin an *Optional***
 
-The next approach uses both *monadic bind* on **Optional** and the *nil coalescing operator*.
+The next approach uses both *map* on **Optional** and the *nil coalescing operator*.
 It does exactly the same thing as the **maybe** function, however it's pretty difficult to read.
-The return value of the bind operator is *Optional<Bool>.None* when the *Pet* is *.None*.
+The return value of *map* is *Optional<Bool>.None* when the *Pet* is *.None*.
 The *nil coalescing operator* **??** unwraps the **Optional** value and returns it –
 if there's no associated value to unwrap, it returns the default value, in this case *'false'*.
 */
-let p4 = peeps.filter { ($0.pet >>= { $0.age < 4 }) ?? false }
+
+let p4 = peeps.filter { $0.pet.map { $0.age < 4 } ?? false }
 print(p4)
 
 /*:
-**Flatten the mapping**
-
-Rather than use the custom bind operator **>>=**, it would probably be better in this instance to use Swift's built-in flatMap function.
-*/
-let p5 = peeps.filter { ($0.pet.flatMap { $0.age < 4 }) ?? false }
-print(p5)
-
-/*:
-**What's flatMap?**
-
-The flatMap function is a recent addition to Swift – its behaviour is the same as the custom bind operator **>>=**.
-
-The next thrilling installment of 'Swift Adventures in Monad Land' will discuss flatMap.
-
-* * *
-
 ## A brief look at the **Maybe** type
 
 Out of interest, what would the implementation look like using the custom **Maybe** type instead of **Optionals**?
@@ -147,12 +132,12 @@ To find out, let's create a **Person** struct with a **Maybe<Pet>** property.
 the **Maybe** type does not support automatic wrapping of values).
 */
 struct Person2 {
-    let name:String
-    let pet:Maybe<Pet> // pet property is Pet wrapped in a Maybe
+    let name: String
+    let pet: Maybe<Pet> // pet property is Pet wrapped in a Maybe
 }
 
 extension Person2 : CustomStringConvertible {
-    var description: String {
+    var description : String {
         switch pet {
         case .Some(let p) : return "\(name) has a Pet aged: \(p.age)"
         default : return "\(name) has no pet"
@@ -160,28 +145,21 @@ extension Person2 : CustomStringConvertible {
     }
 }
 //: create an array of people, this time with **Maybe<Pet>** properties
-let peeps2 = [Person2(name: "Fred", pet:Maybe(Pet(age: 10))),
-              Person2(name: "Jane", pet:Maybe(Pet(age: 1))),
-              Person2(name: "Eric", pet:.None)]
+let peeps2 = [Person2(name: "Fred", pet: Maybe(Pet(age: 10))),
+              Person2(name: "Jane", pet: Maybe(Pet(age: 1))),
+              Person2(name: "Eric", pet: .None)]
 /*:
 A first attempt at filtering the Array might be as follows:
 
-    peeps2.filter { $0.pet >>= { pure($0.age < 4) } }
+    peeps2.filter { $0.pet.map { $0.age < 4 } }
 
 This seems like a reasonable approach, but it doesn't work. 
 The reason is because the return type of the closure passed to filter is incorrect.
 **filter** expects a closure with a return type of **Bool**.
 
-    { $0.pet >>= { pure($0.age < 4) } }
+    { $0.pet.map { $0.age < 4 } }
 
-The return type of the above closure is **Maybe<Bool>**. 
-The **pure** function is responsible for *lifting* the return value of the closure into the **Maybe** type.
-Well, that's easy to fix; just dispense with the **pure** function and return a plain **Bool**.
-Not so fast, that won't work either, because the bind operator **>>=** expects a return type of **Maybe<T>**, not **Bool**.
-
-**Argh**, looks like we're consigned to purgatory.
-
-A desperate technique to escape from type-checking purgatory would look like this:
+A desperate technique to escape from type-checking purgatory could look like this:
 
     peeps2.filter { switch $0.pet {
         case .Some(let pet) : return pet.age < 4
@@ -192,14 +170,22 @@ A desperate technique to escape from type-checking purgatory would look like thi
 That would work, but it's ugly as hell – which is where we're destined for writing code like that. 
 Thankfully, there's a way to avoid it and it requires the **maybe** function – this time implemented for the **Maybe** type.
 */
-func maybe<A,B>(@autoclosure defaultValue:() -> B, opt:Maybe<A>, @noescape f:A -> B) -> B {
+func maybe<A,B>(opt: Maybe<A>, @autoclosure defaultValue: () -> B, @noescape f: A -> B) -> B {
     switch opt {
     case .None : return defaultValue()
     case .Some(let x) : return f(x)
     }
 }
 //: By using the **maybe** function, the filter expression can be implemented in a reasonably sane fashion:
-let p6 = peeps2.filter { maybe(false, opt: $0.pet) { $0.age < 4 } }
+let p5 = peeps2.filter { maybe($0.pet, defaultValue: false) { $0.age < 4 } }
 
-print("People who own pets, younger than 4 years old:\n\n\(p6)")
+print("People who own pets, younger than 4 years old:\n\n\(p5)")
 
+/*:
+Another possiblity would require an implementation of the **??** operator for the **Maybe** type.
+This is possible because in Swift *operators* are defined just like ordinary functions.
+If you do implement **??** for **Maybe**, the following would work too:
+
+    peeps2.filter { $0.pet.map { $0.age < 4 } ?? false }
+
+*/

@@ -13,7 +13,7 @@ public enum Maybe<T> : NilLiteralConvertible {
     public init(_ some: T) { self = Some(some) }
     public init(nilLiteral: ()) { self = None }
     
-    func map<U>(f: T -> U) -> Maybe<U> {
+    public func map<U>(f: T -> U) -> Maybe<U> {
         switch self {
         case .None : return .None
         case .Some(let x) : return .Some(f(x))
