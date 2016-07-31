@@ -15,17 +15,17 @@ The *map* method uses *self* as an implicit first parameter, whereas the functio
 Other than that, the functionality is identical. The reason for declaring *map* as a function is to show how
 similar it is to *monadic bind* – declared below
 */
-func map<A,B>(m: Maybe<A>, _ f: A -> B) -> Maybe<B> {
+func map<A,B>(_ m: Maybe<A>, _ f: (A) -> B) -> Maybe<B> {
     switch m {
-    case .None : return .None
-    case .Some(let x) : return .Some(f(x))
+    case .none : return .none
+    case .some(let x) : return .some(f(x))
     }
 }
 //: An example of using *map* with a *Maybe<Array>* and passing a closure using the *sort* function as second parameter
-let n = map(Maybe([3,2,5,1,4])) { $0.sort() }
+let n = map(Maybe([3,2,5,1,4])) { $0.sorted() }
 print(n)
 //: *Lift* plain values into the **Maybe** type. It's the explicit equivalent of *implicit Optional wrapping*.
-func pure<A>(x: A) -> Maybe<A> {
+func pure<A>(_ x: A) -> Maybe<A> {
     return Maybe(x)
 }
 /*:
@@ -37,16 +37,16 @@ The **>>=** (bind) operator is very similar to the *map* function, declared abov
     func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B>
 
 The only difference between *map* and *monadic bind* is that the second parameter returns a *Maybe* for the *bind operator*.
-This means that in the *.Some* case the function **f** will return the **Maybe** that is required.
+This means that in the *.some* case the function **f** will return the **Maybe** that is required.
 The return value for *map* needs to be explicitly wrapped in a **Maybe** as the function **f** has the type *A -> B*.
 
 Compare the implementation of **map** (above) to **>>=** to see how similar they are.
 */
 infix operator >>= { associativity left }
-func >>= <A,B> (m: Maybe<A>, f: A -> Maybe<B>) -> Maybe<B> {
+func >>= <A,B> (m: Maybe<A>, f: (A) -> Maybe<B>) -> Maybe<B> {
     switch m {
-    case .None : return .None
-    case .Some(let m) : return f(m)
+    case .none : return .none
+    case .some(let m) : return f(m)
     }
 }
 /*:
@@ -93,9 +93,9 @@ struct Room { let length: Int, width: Int }
 struct Residence { let rooms: [Room] }
 struct Person { let name: String, residence: Maybe<Residence> }
 //:Create two people: one without a residence and one with a residence
-let bob = Person(name: "Bob", residence: .None)
+let bob = Person(name: "Bob", residence: .none)
 let jo = Person(name: "Jo",
-    residence: .Some(
+    residence: .some(
         Residence(rooms: [Room(length: 4, width: 3), Room(length: 2, width: 2)])
     )
 )
@@ -108,13 +108,13 @@ The use of *switch statements* would add verbosity and remove clarity.
 
 Notice that the *pure* function is used to lift the return value into the **Maybe** type.
 */
-func livingSpace(person: Maybe<Person>) -> Maybe<Int> {
+func livingSpace(_ person: Maybe<Person>) -> Maybe<Int> {
     return person >>= { $0.residence }
                   >>= { pure($0.rooms.map { $0.length * $0.width }.reduce(0, combine: +)) }
 }
 //: Call *livingSpace* function with a *Maybe<Person>*
 let bob_space = livingSpace(Maybe(bob))
-print(bob_space) // Bob has no residence, therefore the return value will be .None
+print(bob_space) // Bob has no residence, therefore the return value will be .none
 //: Call *livingSpace* function with a *Maybe<Person>*
 let jo_space = livingSpace(Maybe(jo))
 print(jo_space)
@@ -131,7 +131,7 @@ they're still happening, but concealed beneath the syntax sugar of Optional chai
 
 struct Person2 { let name: String, residence: Residence?}
 
-let jed = Person2(name: "Jed", residence: .None)
+let jed = Person2(name: "Jed", residence: .none)
 let fi = Person2(name: "Fi", residence: Residence(rooms: [Room(length: 4, width: 3), Room(length: 2, width: 2)]))
 /*:
 A function that takes a *Optional<Person>* and returns their 'livingspace' as an *Optional<Int>*
@@ -139,11 +139,11 @@ A function that takes a *Optional<Person>* and returns their 'livingspace' as an
 Values passed to the function will be automatically *lifted* into the *Optional* type.
 This differs from our custom *Maybe* type, where auto-lifting does not occur.
 */
-func livingSpace(person: Person2?) -> Int? {
+func livingSpace(_ person: Person2?) -> Int? {
     return person?.residence?.rooms.map {$0.length * $0.width }.reduce(0, combine: +)
 }
 //: The parameter to *livingSpace* is declared *Optional*, but we can pass a non-Optional value
-let jed_space = livingSpace(jed) // nil (Or to be precise .None)
+let jed_space = livingSpace(jed) // nil (Or to be precise .none)
 
-let fi_space = livingSpace(fi) // Some(16) - but Xcode will just state 16, because it's mendacious.
+let fi_space = livingSpace(fi) // some(16) - but Xcode will just state 16, because it's mendacious.
 

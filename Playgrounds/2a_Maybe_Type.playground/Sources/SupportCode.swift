@@ -1,11 +1,11 @@
 
 // Declare The Maybe type to use with MaybeDictionary
 public enum Maybe<T> : NilLiteralConvertible {
-    case None, Some(T)
+    case none, some(T)
     
-    public init() { self = None }
-    public init(_ some: T) { self = Some(some) }
-    public init(nilLiteral: ()) { self = None }
+    public init() { self = none }
+    public init(_ s: T) { self = some(s) }
+    public init(nilLiteral: ()) { self = none }
 }
 
 
@@ -18,7 +18,7 @@ public struct MaybeDictionary<Key: Hashable, Value>: DictionaryLiteralConvertibl
     private typealias Storage = [Element]
     private var _store: Storage = []
     
-    private func _indexForKey(key: Key) -> Storage.Index? {
+    private func _indexForKey(_ key: Key) -> Storage.Index? {
         for (idx, (k, _)) in zip(_store.indices, _store) {
             if key == k { return idx }
         }
@@ -30,22 +30,22 @@ public struct MaybeDictionary<Key: Hashable, Value>: DictionaryLiteralConvertibl
             if let idx = _indexForKey(key) {
                 return Maybe(_store[idx].1)
             }
-            return .None
+            return .none
         }
         
         set(newValue) {
             switch (_indexForKey(key), newValue) {
                 
-            case let (.Some(idx), .Some(value)):
+            case let (.some(idx), .some(value)):
                 _store[idx].1 = value
                 
-            case let (.Some(idx), .None):
-                _store.removeAtIndex(idx)
+            case let (.some(idx), .none):
+                _store.remove(at: idx)
                 
-            case let (.None, .Some(value)):
+            case let (.none, .some(value)):
                 _store.append((key, value))
                 
-            case (.None,.None): break
+            case (.none,.none): break
             }
         }
     }

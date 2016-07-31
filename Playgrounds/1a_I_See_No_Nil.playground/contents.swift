@@ -21,8 +21,8 @@ What value can **nil** become? Well, almost certainly, it will become an **Optio
 that has two possible cases. Here it is:
 
     enum Optional<T> {
-        case None
-        case Some(T)
+        case none
+        case some(T)
     }
 
 Instead of **nil** the potential non-existence of a value will be represented by the **Optional** type.
@@ -33,7 +33,7 @@ If you miss the good old days of runtime **nil** crashes, then you can just thro
 * * *
 
 Unfortunately, Xcode is really unhelpful when displaying **Optional** values –
-*.None* is displayed as *nil* and wrapped values are displayed as plain values.
+*.none* is displayed as *nil* and wrapped values are displayed as plain values.
 The function *optToString*, used in the code below is not a Swift library function,
 it has been added to give useful **String** representations of **Optionals**.
 Take a look in the *Sources* folder if you're interested in why and how it's implemented.
@@ -76,11 +76,11 @@ Here's an example of how the **Optional** type can conform to the **NilLiteralCo
 
     enum Optional<T> : NilLiteralConvertible {
         init(nilLiteral: ()) {
-            self = None
+            self = none
         }
     }
 
-The only sensible value for the **Optional** is the **None** case.
+The only sensible value for the **Optional** is the **none** case.
 
 * * *
 
@@ -91,15 +91,15 @@ the type must conform to the **NilLiteralConvertible** protocol. Example:
 
 * * *
 
-Instead of assigning **nil** to a variable, it is perfectly valid to assign **.None**.
+Instead of assigning **nil** to a variable, it is perfectly valid to assign **.none**.
 In fact, the result is exactly the same and it is also immediately clear that an **Optional** is being assigned – 
 consequently, the expression does not need to be squeezed through the **NilLiteralConvertible** sausage machine.
 */
 
-let a1: Int? = .None
+let a1: Int? = .none
 optToString(a1)
 
-let b1: String? = .None
+let b1: String? = .none
 optToString(b)
 
 /*:
@@ -110,7 +110,7 @@ One way to query an **Optional** value to find out if it has an *associated valu
 **But, is equality really tested against *nil*? *No***, it will be transformed into a valid value with **NilLiteralConvertible**.
 
 Just as in the examples above (where **nil** is assigned to a variable), the value of the variable is never **nil**, 
-it is **Optional<T>.None** (where **T** is an actual type, such as *Int*, *String*, etc).
+it is **Optional<T>.none** (where **T** is an actual type, such as *Int*, *String*, etc).
 
 * * *
 
@@ -129,13 +129,13 @@ f != nil
 /*:
 If the types can be inferred, explicit type declarations are not required.
 The **Int()** initializer with a String argument returns an **Optional<Int>**.
-Also, just like assigning **.None** to a variable, it's perfectly valid (and arguably clearer) to test for equality with **.None**
+Also, just like assigning **.none** to a variable, it's perfectly valid (and arguably clearer) to test for equality with **.none**
 */
 let g = Int("hello")
-g != .None
+g != .none
 
 let h: Int? = Int("42")
-h != .None
+h != .none
 /*:
 When a variable is declared as an **Optional** it is possible to assign a *non-optional* value to the variable.
 The *non-optional* value will be automatically wrapped in an **Optional**.
@@ -146,7 +146,7 @@ For example the same does not apply to other ‘containers’, such as **Array**
 
 Whereas the following is acceptable:
 
-    let x:Int? = 8 // result is: Optional<Int>.Some(8)
+    let x:Int? = 8 // result is: Optional<Int>.some(8)
 
 * * *
 
@@ -162,18 +162,18 @@ nil < 0
 The first thing to recall is that **nil** isn't really **nil**, it's an **Optional**.
 What we really have is:
 
-    .None < 0
+    .none < 0
 */
-(.None) < 0
+(.none) < 0
 
 /*:
-The question is: What type of **.None** is it? It's an **Optional**, 
+The question is: What type of **.none** is it? It's an **Optional**, 
 but an **Optional** must have an associated type. In this instance
-the only sensible type is **Int**. Therefore **.None** can be expanded to:
+the only sensible type is **Int**. Therefore **.none** can be expanded to:
 
-    Optional<Int>.None < 0
+    Optional<Int>.none < 0
 */
-Optional<Int>.None < 0
+Optional<Int>.none < 0
 
 /*:
 We've fully expanded the type of **nil**, but there's another problem to address.
@@ -192,7 +192,7 @@ There isn't another overload of the **<** operator that accepts **Optionals** an
 As previously mentioned, it's possible (and normal practice) to declare an **Optional** type then assign
 a normal value to it:
 
-    let x:Int? = 8 // result is: Optional<Int>.Some(8)
+    let x:Int? = 8 // result is: Optional<Int>.some(8)
 
 The same thing occurs when a parameter to a function is an **Optional** value -
 a non-optional can be passed to the function and it will automatically become an **Optional** within the context of the function.
@@ -201,17 +201,17 @@ This implicit behaviour doesn't have an official name, but **automatic Optional 
 
 Therefore in the expression:
 
-    Optional<Int>.None < 0
+    Optional<Int>.none < 0
 
 The right hand side is automatically lifted into an **Optional**:
 
-    Optional<Int>.None < .Some(0)
+    Optional<Int>.none < .some(0)
 
 To give the most explicit and verbose form:
 
-    Optional<Int>.None < Optional<Int>.Some(0)
+    Optional<Int>.none < Optional<Int>.some(0)
 */
-Optional<Int>.None < Optional<Int>.Some(0)
+Optional<Int>.none < Optional<Int>.some(0)
 
 /*:
 The seemingly simple expression:
@@ -220,16 +220,16 @@ The seemingly simple expression:
 
 Will, after compilation, become:
 
-    Optional<Int>.None < Optional<Int>.Some(0)
+    Optional<Int>.none < Optional<Int>.some(0)
 
 Here is an implementation of **<** for **Optional** types - 
-**.None** is by default always less than **.Some**. When both values are **.Some**, 
+**.none** is by default always less than **.some**. When both values are **.some**, 
 their wrapped values are compared to give a result.
 
     func < <T: Comparable>(lhs: T?, rhs: T?) -> Bool {
         switch (lhs, rhs) {
-        case (.None, .Some) : return true
-        case let (.Some(x), .Some(y)) : return x < y
+        case (.none, .some) : return true
+        case let (.some(x), .some(y)) : return x < y
         default : return false
         }
     }
@@ -242,9 +242,9 @@ The same logic applies to all **Comparable** types. Here's an example with **Str
 */
 "a" > nil
 
-"a" > .None
+"a" > .none
 
-Optional<String>.Some("a") > Optional<String>.None
+Optional<String>.some("a") > Optional<String>.none
 
 /*:
 * * *

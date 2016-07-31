@@ -4,7 +4,7 @@
 The purpose of implementing our own **Optional** type is to demonstrate that **Optionals** are simple **enum values**.
 
 As the **Optional** type already exists, we'll need a new name.
-The name **Maybe** is taken from Haskell, but the two cases *None* & *Some*
+The name **Maybe** is taken from Haskell, but the two cases *none* & *some*
 are the same as Swift's **Optional** type (Haskell uses *Nothing* & *Just*).
 The **Maybe** type conforms to *NilLiteralConvertible*, as does Swift's **Optional** type.
 This allows a **Maybe** value to be constructed from *nil*.
@@ -13,36 +13,36 @@ This allows a **Maybe** value to be constructed from *nil*.
 One aspect of Swift's **Optional** type which can't be reproduced is
 *implicit Optional wrapping*. Here's an example:
 
-    .None < 0
+    .none < 0
 
 Such a comparison should not be possible as the types don't match.
 However, Swift will automatically convert the expression to:
 
-    .None < .Some(0)
+    .none < .some(0)
 
 It's impossible to reproduce the recipe for this secret sauce – it's an
 **Optional** only capability which is often convenient, sometimes bizarre.
 *Implicit Optional wrapping* also comes into play when returning **Optional**
 values from functions. When reimplementing **Optionals**, values must always
-be explicity wrapped using *Maybe(x)*, or by using the *.Some(x)* constructor.
+be explicity wrapped using *Maybe(x)*, or by using the *.some(x)* constructor.
 */
 
 enum Maybe<T> : NilLiteralConvertible {
-    case None
-    case Some(T)
+    case none
+    case some(T)
     
-    init() { self = None } // init with no args defaults to 'None'
-    init(_ some: T) { self = Some(some) }
-    init(nilLiteral: ()) { self = None } // init with 'nil' defaults to 'None'
+    init() { self = none } // init with no args defaults to 'none'
+    init(_ s: T) { self = some(s) }
+    init(nilLiteral: ()) { self = none } // init with 'nil' defaults to 'none'
 /*:
 *map* takes a normal function from *T -> U* and runs it inside the **Maybe**.
-* If the value of **self** is *.None* the function is not applied and *.None* is returned.
-* If *self* matches the *.Some* case, then the function is applied to the *Associated Value* and wrapped in a **Maybe**
+* If the value of **self** is *.none* the function is not applied and *.none* is returned.
+* If *self* matches the *.some* case, then the function is applied to the *Associated Value* and wrapped in a **Maybe**
 */
-    func map<U>(f: T -> U) -> Maybe<U> {
+    func map<U>(_ f: (T) -> U) -> Maybe<U> {
         switch self {
-        case .None : return .None
-        case .Some(let x) : return .Some(f(x))
+        case .none : return .none
+        case .some(let x) : return .some(f(x))
         }
     }
 }
@@ -50,8 +50,8 @@ enum Maybe<T> : NilLiteralConvertible {
 extension Maybe : CustomStringConvertible {
     var description: String {
         switch self {
-        case .None : return "{None}"
-        case .Some(let x) : return "{Some \(x)}"
+        case .none : return "{none}"
+        case .some(let x) : return "{some \(x)}"
         }
     }
 }
@@ -71,16 +71,16 @@ we don't get any operators for free :(
 
 func == <T: Equatable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
     switch (lhs, rhs) {
-    case (.None, .None) : return true
-    case let (.Some(x), .Some(y)) : return x == y
+    case (.none, .none) : return true
+    case let (.some(x), .some(y)) : return x == y
     default : return false
     }
 }
 
 func < <T: Comparable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
     switch (lhs, rhs) {
-    case (.None, .Some) : return true
-    case let (.Some(x), .Some(y)) : return x < y
+    case (.none, .some) : return true
+    case let (.some(x), .some(y)) : return x < y
     default : return false
     }
 }
@@ -144,7 +144,7 @@ let dict = [1:[2:[3:"Hello!"]]]
 let val = dict[1]?[2]?[3]
 
 /*:
-The type of *val* is not a plain **String**, it is an **Optional** (*.Some("Hello!")*) - Xcode lies a little!
+The type of *val* is not a plain **String**, it is an **Optional** (*.some("Hello!")*) - Xcode lies a little!
 
 * * *
 
@@ -165,14 +165,14 @@ Now the difficulty arises: how do we subscript into the nested *Dictionary* to r
 let v: Maybe<String>
 
 switch mDict[1] {
-case .None : v = .None
-case .Some(let d) :
+case .none : v = .none
+case .some(let d) :
     switch d[2] {
-    case .None : v = .None
-    case .Some(let d) :
+    case .none : v = .none
+    case .some(let d) :
         switch d[3] {
-        case .None : v = .None
-        case .Some(let x) : v = .Some(x)
+        case .none : v = .none
+        case .some(let x) : v = .some(x)
         }
     }
 }

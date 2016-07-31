@@ -24,7 +24,7 @@ The return type needs to be **Array<B>**. If we use the **map** function, we'd n
 alternatively, we could use a mutable **Array** and update it within a loop, or we could use the **reduce** function, as follows.
 */
 infix operator >>= {associativity left}
-func >>= <A,B>(x: [A], f: A -> [B]) -> [B] {
+func >>= <A,B>(x: [A], f: (A) -> [B]) -> [B] {
     return x.reduce([]) { result, item in result + f(item) }
 }
 /*:
@@ -54,14 +54,14 @@ A problem involving performing calculations on **Arrays**, what better way than�
 This particular problem will obviousy require nuts. Here we go:
 */
 enum Nut: CustomStringConvertible {
-    case Acorn, Hazel, Chestnut, Cashew
+    case acorn, hazel, chestnut, cashew
     
     var description: String { // boring boilerplate
         switch self {
-        case .Acorn :    return "Acorn"
-        case .Hazel :    return "Hazel"
-        case .Chestnut : return "Chestnut"
-        case .Cashew :   return "Cashew"
+        case .acorn :    return "Acorn"
+        case .hazel :    return "Hazel"
+        case .chestnut : return "Chestnut"
+        case .cashew :   return "Cashew"
         }
     }
 }
@@ -89,27 +89,27 @@ struct Squirrel {
 */
 let fred = Squirrel(name: "Fred", caches: [
     Cache(location: (104, -20),
-        nuts: [.Acorn, .Acorn, .Chestnut, .Cashew]),
+        nuts: [.acorn, .acorn, .chestnut, .cashew]),
     Cache(location: (87, 45),
-        nuts: [.Hazel, .Chestnut])])
+        nuts: [.hazel, .chestnut])])
 
 let bob = Squirrel(name: "Bob", caches: [
     Cache(location: (-12, 15),
-        nuts: Array(count: 12, repeatedValue: .Cashew))])
+        nuts: Array(repeating: .cashew, count: 12))])
 
 let jane = Squirrel(name: "Jane", caches: [
     Cache(location: (-36, -96),
-        nuts: Array(count: 10, repeatedValue: .Acorn)),
+        nuts: Array(repeating: .acorn, count: 10)),
     Cache(location: (212, 4),
-        nuts: [.Chestnut, .Chestnut, .Hazel])])
+        nuts: [.chestnut, .chestnut, .hazel])])
 
 let bertha = Squirrel(name: "Bertha", caches: [
     Cache(location: (24, -164),
-        nuts: Array(count: 8, repeatedValue: .Acorn)),
+        nuts: Array(repeating: .acorn, count: 8)),
     Cache(location: (-129, 10),
-        nuts: [.Acorn, .Hazel, .Hazel, .Hazel, .Chestnut]),
+        nuts: [.acorn, .hazel, .hazel, .hazel, .chestnut]),
     Cache(location: (27, -16),
-        nuts: [.Hazel, .Hazel, .Chestnut])])
+        nuts: [.hazel, .hazel, .chestnut])])
 
 
 let squirrels = [fred, bob, jane, bertha]
@@ -169,7 +169,7 @@ print(nuts2)
 /*:
 An alternative approach would be to add a top-level function that serves the same purpose.
 */
-func nuts(squirrel:Squirrel) -> [Nut] {
+func nuts(_ squirrel:Squirrel) -> [Nut] {
     return squirrel.caches.flatMap { cache in cache.nuts }
 }
 
@@ -197,7 +197,7 @@ For our stocktaking purposes, it would be useful to know what types of **Nuts** 
 have been gathering. The **Squirrel** type can be extended to add the desired functionality:
 */
 extension Squirrel {
-    func nutsOfType(nut:Nut) -> [Nut] {
+    func nutsOfType(_ nut:Nut) -> [Nut] {
         return self.nuts.filter { n in n == nut }
     }
 }
@@ -205,26 +205,26 @@ extension Squirrel {
 Let's put this new functionality through its paces.
 We can now ask a **Squirrel** to return **Nuts** of a specific type:
 */
-let chestnuts = jane.nutsOfType(.Chestnut)
+let chestnuts = jane.nutsOfType(.chestnut)
 print(chestnuts)
 
 //: By using **flatMap**, it's easy to return all the **Nuts** of a specific type from every **Squirrel**:
-let allChestnuts = squirrels.flatMap { $0.nutsOfType(.Chestnut) }
+let allChestnuts = squirrels.flatMap { $0.nutsOfType(.chestnut) }
 print(allChestnuts)
 
 //: To return the number of **Nuts** rather than the **Nuts** themselves, simply **count** the return value:
-let acornCount = squirrels.flatMap { $0.nutsOfType(.Acorn) }.count
+let acornCount = squirrels.flatMap { $0.nutsOfType(.acorn) }.count
 print("Number of acorns: \(acornCount)")
 
 /*:
 Just as it was possible to define the **nuts** function as a top-level function as opposed to a method/computed value,
 it is perfectly possible to do the same for the **nutsOfType** function:
 */
-func nutsOfType(squirrel:Squirrel, nut:Nut) -> [Nut] {
+func nutsOfType(_ squirrel:Squirrel, nut:Nut) -> [Nut] {
     return nuts(squirrel).filter { $0 == nut }
 }
 
-let acornCount2 = squirrels.flatMap { nutsOfType($0, nut: .Acorn) }.count
+let acornCount2 = squirrels.flatMap { nutsOfType($0, nut: .acorn) }.count
 print("Number of acorns: \(acornCount2)")
 
 /*:
@@ -243,19 +243,23 @@ Upon receiving an argument, a function is returned that takes the remaining para
 A new function is returned for every argument, until the final argument is supplied,
 then the whole expression will be evaluated and a value can be returned.
 
+Note that in Swift 3, currying `func` declaration syntax was removed from the language, therefore a more elaborate syntax is needed to achieve currying.
+
 This is what the **curried** function looks like:
 */
-func nutsOfType(nut:Nut)(squirrel:Squirrel) -> [Nut] {
-    return nuts(squirrel).filter { $0 == nut }
+func nutsOfType(_ nut:Nut) -> (Squirrel) -> [Nut] {
+	return { squirrel in
+		return nuts(squirrel).filter { $0 == nut }
+	}
 }
 //: By supplying the first argument, a new function is returned:
-let acornsOnly = nutsOfType(.Acorn)
+let acornsOnly = nutsOfType(.acorn)
 /*: 
 The *acornsOnly* function is a **partially applied function**.
 Which means that previously supplied arguments are captured within the context of the function.
 When the final argument is received, the whole expression can be evaluated, as if all the arguments were given together.
 */
-let fredsAcorns = acornsOnly(squirrel: fred)
+let fredsAcorns = acornsOnly(fred)
 print("Fred’s Acorns: \n\(fredsAcorns)")
 
 /*:
@@ -269,7 +273,7 @@ print("Number of acorns: \(acornCount3)")
 /*:
 It is not necessary to create a new named function for use with **flatMap**, the curried function can simply be partially applied in place.
 */
-let acornCount4 = squirrels.flatMap(nutsOfType(.Acorn)).count
+let acornCount4 = squirrels.flatMap(nutsOfType(.acorn)).count
 print("Number of acorns: \(acornCount4)")
 
 /*:
@@ -281,9 +285,9 @@ It's a subtle difference, but the top-level, curried function is arguably the mo
 Using a method with **flatMap** isn't any easier to read, it simply adds extra syntactic noise.
 */
 //: Using a method call
-let hazels1 = squirrels.flatMap { $0.nutsOfType(.Hazel) }.count
+let hazels1 = squirrels.flatMap { $0.nutsOfType(.hazel) }.count
 //: Using a top-level function
-let hazels2 = squirrels.flatMap(nutsOfType(.Hazel)).count
+let hazels2 = squirrels.flatMap(nutsOfType(.hazel)).count
 
 /*:
 ### Until next time…

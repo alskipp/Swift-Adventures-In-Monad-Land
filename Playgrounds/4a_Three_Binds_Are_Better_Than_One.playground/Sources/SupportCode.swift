@@ -1,9 +1,9 @@
 import Foundation
 
-public func JSONFromFile(file: String) -> AnyObject? {
-  return NSBundle.mainBundle().pathForResource(file, ofType: "json").flatMap { p in
-    NSData(contentsOfFile: p).flatMap { data in
-      try! NSJSONSerialization.JSONObjectWithData(data, options: [])
+public func JSONFromFile(_ file: String) -> AnyObject? {
+  return Bundle.main.pathForResource(file, ofType: "json").flatMap { p in
+    (try? Data(contentsOf: URL(fileURLWithPath: p))).flatMap { data in
+      try! JSONSerialization.jsonObject(with: data, options: [])
     }
   }
 }
@@ -29,9 +29,16 @@ public struct Person: CustomStringConvertible {
 /*
 A curried constructor function to use with the <*> operator. See below.
 */
+public typealias Name = String
+public typealias Job = String
+public typealias BirthYear = Int
 extension Person {
-  public static func create(name:String)(job:String)(birthYear:Int) -> Person {
-    return Person(name:name, job:job, birthYear:birthYear)
+  public static func create(_ name:Name) -> (Job) -> (BirthYear) -> Person {
+	return { job in
+		return { birthYear in
+			return Person(name:name, job:job, birthYear:birthYear)
+		}
+	}
   }
 }
 
@@ -42,9 +49,9 @@ If both function and value are not nil, then apply the function to the value
 */
 infix operator <*> { associativity left precedence 130 }
 
-public func <*> <A,B>(f:(A -> B)?, x:A?) -> B? {
-  if let f = f, x = x {
+public func <*> <A,B>(f:((A) -> B)?, x:A?) -> B? {
+  if let f = f, let x = x {
     return f(x)
   }
-  return .None
+  return .none
 }

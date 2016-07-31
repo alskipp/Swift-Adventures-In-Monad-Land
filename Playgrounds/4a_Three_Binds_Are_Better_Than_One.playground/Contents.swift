@@ -17,20 +17,20 @@ let dict = [1:[2:[3:[4:[5:"Hello!"]]]]]
 let a:String?
 
 switch dict[1] {
-case .None : a = .None
-case .Some(let d) :
+case .none : a = .none
+case .some(let d) :
     switch d[2] {
-    case .None : a = .None
-    case .Some(let d) :
+    case .none : a = .none
+    case .some(let d) :
         switch d[3] {
-        case .None : a = .None
-        case .Some(let d) :
+        case .none : a = .none
+        case .some(let d) :
             switch d[4] {
-            case .None : a = .None
-            case .Some(let d) :
+            case .none : a = .none
+            case .some(let d) :
                 switch d[5] {
-                case .None : a = .None
-                case .Some(let x) : a = x
+                case .none : a = .none
+                case .some(let x) : a = x
                 }
             }
         }
@@ -53,10 +53,10 @@ If we define the bind operator **>>=** for **Optionals**, it's easy to see the s
 */
 infix operator >>= {associativity left}
 
-func >>= <A,B>(x: A?, f: A -> B?) -> B? {
+func >>= <A,B>(x: A?, f: (A) -> B?) -> B? {
     switch x {
-    case .None : return .None
-    case .Some(let x) : return f(x)
+    case .none : return .none
+    case .some(let x) : return f(x)
     }
 }
 //: The monadic nature of *Optional chaining*
@@ -82,10 +82,10 @@ As **if let** is a statement, not an expression, a variable must be declared fir
 */
 let ifLetBind:String?
 
-if let a = dict[1], b = a[2], c = b[3], d = c[4], e = d[5] {
+if let a = dict[1], let b = a[2], let c = b[3], let d = c[4], let e = d[5] {
     ifLetBind = e
 } else {
-    ifLetBind = .None
+    ifLetBind = .none
 }
 
 ifLetBind
@@ -100,7 +100,7 @@ For example, the following is **not** the equivalent of monadic bind, because th
 let x = Optional(1)
 let y = Optional(2)
 
-if let a = x, b = y {
+if let a = x, let b = y {
     a + b
 }
 /*:
@@ -153,7 +153,7 @@ str.characters.first.flatMap { String($0).toInt() }
 
 str.characters.first >>= { String($0).toInt() }
 
-if let c = str.characters.first, i = String(c).toInt() {
+if let c = str.characters.first, let i = String(c).toInt() {
     i
 }
 /*:
@@ -190,17 +190,17 @@ Using **if let**, it's possible to cast the **Optional<AnyObject>** to **JSON** 
 
 We can then subscript into **j** within the **if let** statement to access the JSON values
 (casting to the correct type as we do so). As later bindings depend upon the previous variable **j**, this is a monadic bind operation.
-Finally, if the **if let** statement succeeds, create and return the **Person** type, otherwise, return **.None**.
+Finally, if the **if let** statement succeeds, create and return the **Person** type, otherwise, return **.none**.
 */
-func parseJSON(json:AnyObject?) -> Person? {
+func parseJSON(_ json:AnyObject?) -> Person? {
   if let j = json as? JSON,
-         name = j["name"] as? String,
-         job = j["job"] as? String,
-         year_of_birth = j["year_of_birth"] as? Int
+         let name = j["name"] as? String,
+         let job = j["job"] as? String,
+         let year_of_birth = j["year_of_birth"] as? Int
   {
     return Person(name:name, job:job, birthYear:year_of_birth)
   } else {
-    return .None
+    return .none
   }
 }
 /*:
