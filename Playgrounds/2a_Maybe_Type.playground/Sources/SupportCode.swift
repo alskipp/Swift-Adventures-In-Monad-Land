@@ -1,11 +1,11 @@
 
 // Declare The Maybe type to use with MaybeDictionary
-public enum Maybe<T> : NilLiteralConvertible {
+public enum Maybe<T> : ExpressibleByNilLiteral {
     case none, some(T)
     
-    public init() { self = none }
-    public init(_ s: T) { self = some(s) }
-    public init(nilLiteral: ()) { self = none }
+    public init() { self = .none }
+    public init(_ s: T) { self = .some(s) }
+    public init(nilLiteral: ()) { self = .none }
 }
 
 
@@ -13,7 +13,7 @@ public enum Maybe<T> : NilLiteralConvertible {
 The implementation of MaybeDictionary is adapted from http://airspeedvelocity.net
 */
 
-public struct MaybeDictionary<Key: Hashable, Value>: DictionaryLiteralConvertible {
+public struct MaybeDictionary<Key: Hashable, Value>: ExpressibleByDictionaryLiteral {
     public typealias Element = (Key, Value)
     private typealias Storage = [Element]
     private var _store: Storage = []

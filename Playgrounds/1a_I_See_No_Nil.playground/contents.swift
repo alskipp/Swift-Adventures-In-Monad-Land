@@ -62,19 +62,19 @@ optToString(c)
 The examples above show an assigment of **nil**, yet the value of the variable is not **nil**, it's an **Optional**.
 Is there some secret compiler shenanigans ocurring which is responsible for figuring out how to transform **nil**
 into a normal, useable value? Well, not really. The mechanism responsible for transforming **nil** into something useful
-is the protocol, **NilLiteralConvertible**. Here it is:
+is the protocol, **ExpressibleByNilLiteral**. Here it is:
 
-    protocol NilLiteralConvertible {
+    protocol ExpressibleByNilLiteral {
         init(nilLiteral: ())
     }
 
-Nothing magical there. If a type conforms to the **NilLiteralConvertible** protocol, it must implement an *init* method
+Nothing magical there. If a type conforms to the **ExpressibleByNilLiteral** protocol, it must implement an *init* method
 which can produce a default value of the type. The *init* method receives one argument containing no useful information 
 (it is merely the *empty tuple*). It is therefore impossible to derive any information from the
 argument (it's simply a stand-in for *nil*) and a *default* value must be returned from the method. 
-Here's an example of how the **Optional** type can conform to the **NilLiteralConvertible** protocol:
+Here's an example of how the **Optional** type can conform to the **ExpressibleByNilLiteral** protocol:
 
-    enum Optional<T> : NilLiteralConvertible {
+    enum Optional<T> : ExpressibleByNilLiteral {
         init(nilLiteral: ()) {
             self = none
         }
@@ -85,15 +85,15 @@ The only sensible value for the **Optional** is the **none** case.
 * * *
 
 It's not possible to assign **nil** to any type of value,
-the type must conform to the **NilLiteralConvertible** protocol. Example:
+the type must conform to the **ExpressibleByNilLiteral** protocol. Example:
 
-    let v:Int = nil // *Error* Type 'Int' does not conform to protocol 'NilLiteralConvertible'
+    let v:Int = nil // *Error* Type 'Int' does not conform to protocol 'ExpressibleByNilLiteral'
 
 * * *
 
 Instead of assigning **nil** to a variable, it is perfectly valid to assign **.none**.
 In fact, the result is exactly the same and it is also immediately clear that an **Optional** is being assigned – 
-consequently, the expression does not need to be squeezed through the **NilLiteralConvertible** sausage machine.
+consequently, the expression does not need to be squeezed through the **ExpressibleByNilLiteral** sausage machine.
 */
 
 let a1: Int? = .none
@@ -107,7 +107,7 @@ optToString(b)
 
 One way to query an **Optional** value to find out if it has an *associated value* is to test for equality with **‘nil’**.
 
-**But, is equality really tested against *nil*? *No***, it will be transformed into a valid value with **NilLiteralConvertible**.
+**But, is equality really tested against *nil*? *No***, it will be transformed into a valid value with **ExpressibleByNilLiteral**.
 
 Just as in the examples above (where **nil** is assigned to a variable), the value of the variable is never **nil**, 
 it is **Optional<T>.none** (where **T** is an actual type, such as *Int*, *String*, etc).
@@ -249,5 +249,5 @@ Optional<String>.some("a") > Optional<String>.none
 /*:
 * * *
 
-That's the end of this expedition into the heart of darkness of **nil**, **NilLiteralConvertible** and **Optional** values.
+That's the end of this expedition into the heart of darkness of **nil**, **ExpressibleByNilLiteral** and **Optional** values.
 */

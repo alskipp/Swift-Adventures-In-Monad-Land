@@ -1,9 +1,9 @@
-public enum Maybe<T> : NilLiteralConvertible {
+public enum Maybe<T> : ExpressibleByNilLiteral {
     case none, some(T)
     
-    public init() { self = none }
-    public init(_ s: T) { self = some(s) }
-    public init(nilLiteral: ()) { self = none }
+    public init() { self = .none }
+    public init(_ s: T) { self = .some(s) }
+    public init(nilLiteral: ()) { self = .none }
     
     func map<U>(_ f: (T) -> U) -> Maybe<U> {
         switch self {

@@ -1,7 +1,7 @@
 /*: 
 ## Threatening Monad
 
-Previous installments have focussed on **nil**, **NilLiteralConvertible**, **Optionals** and custom **Maybe** types.
+Previous installments have focussed on **nil**, **ExpressibleByNilLiteral**, **Optionals** and custom **Maybe** types.
 This time let's step away from the tentative world of **Optionals** and take a look at a different beast.
 
 The **Threat** monad!
@@ -22,11 +22,11 @@ enum ThreatLevel : Int, CustomStringConvertible {
     
     var description: String {
         switch self {
-        case low :      return "Low"
-        case guarded :  return "Guarded"
-        case elevated : return "Elevated"
-        case high :     return "High"
-        case severe :   return "Severe"
+        case .low :      return "Low"
+        case .guarded :  return "Guarded"
+        case .elevated : return "Elevated"
+        case .high :     return "High"
+        case .severe :   return "Severe"
         }
     }
 }

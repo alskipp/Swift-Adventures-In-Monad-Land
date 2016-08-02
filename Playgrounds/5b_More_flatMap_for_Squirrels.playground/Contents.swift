@@ -108,7 +108,7 @@ But first, Swift doesn't have built-in functions for **sum** and **average**, so
 They'll be very useful.
 */
 func sum(_ x:[Int]) -> Int {
-    return x.reduce(0, combine: +)
+    return x.reduce(0, +)
 }
 
 func average(_ x:[Int]) -> Float {
@@ -251,7 +251,7 @@ If the **Array** isn't empty the normal **reduce** function will be called using
 func reduce1<A>(_ f:(A,A) -> A) -> ([A]) -> A? {
 	return { xs in
 		return xs.first.map { x in
-			xs[xs.indices.suffix(from: 1)].reduce(x, combine: f)
+			xs[xs.indices.suffix(from: 1)].reduce(x, f)
 		}
 	}
 }

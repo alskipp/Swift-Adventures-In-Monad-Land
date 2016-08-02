@@ -140,7 +140,7 @@ Values passed to the function will be automatically *lifted* into the *Optional*
 This differs from our custom *Maybe* type, where auto-lifting does not occur.
 */
 func livingSpace(_ person: Person2?) -> Int? {
-    return person?.residence?.rooms.map {$0.length * $0.width }.reduce(0, combine: +)
+    return person?.residence?.rooms.map {$0.length * $0.width }.reduce(0, +)
 }
 //: The parameter to *livingSpace* is declared *Optional*, but we can pass a non-Optional value
 let jed_space = livingSpace(jed) // nil (Or to be precise .none)

@@ -6,7 +6,7 @@ The purpose of implementing our own **Optional** type is to demonstrate that **O
 As the **Optional** type already exists, we'll need a new name.
 The name **Maybe** is taken from Haskell, but the two cases *none* & *some*
 are the same as Swift's **Optional** type (Haskell uses *Nothing* & *Just*).
-The **Maybe** type conforms to *NilLiteralConvertible*, as does Swift's **Optional** type.
+The **Maybe** type conforms to *ExpressibleByNilLiteral*, as does Swift's **Optional** type.
 This allows a **Maybe** value to be constructed from *nil*.
 
 ### What can't be implemented?
@@ -27,7 +27,7 @@ values from functions. When reimplementing **Optionals**, values must always
 be explicity wrapped using *Maybe(x)*, or by using the *.some(x)* constructor.
 */
 
-enum Maybe<T> : NilLiteralConvertible {
+enum Maybe<T> : ExpressibleByNilLiteral {
     case none
     case some(T)
     
@@ -105,8 +105,8 @@ print(m2)
 m1 == m2 // Maybe(1) == Maybe(2)
 m1 < m2 // Maybe(1) < Maybe(2)
 m1 > m2 // Maybe(1) > Maybe(2)
-//: *NilLiteralConvertible* in action on custom **Maybe** type
-nil < m1 // NilLiteralConvertible is invoked to contruct a Maybe value from 'nil'
+//: *ExpressibleByNilLiteral* in action on custom **Maybe** type
+nil < m1 // ExpressibleByNilLiteral is invoked to contruct a Maybe value from 'nil'
 //: Example of, *implicit Optional wrapping* with **Optionals**
 Optional(1) < 2
 /*:
