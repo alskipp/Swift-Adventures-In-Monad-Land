@@ -110,7 +110,7 @@ Notice that the *pure* function is used to lift the return value into the **Mayb
 */
 func livingSpace(_ person: Maybe<Person>) -> Maybe<Int> {
     return person >>= { $0.residence }
-                  >>= { pure($0.rooms.map { $0.length * $0.width }.reduce(0, combine: +)) }
+                  >>= { pure($0.rooms.map { $0.length * $0.width }.reduce(0, +)) }
 }
 //: Call *livingSpace* function with a *Maybe<Person>*
 let bob_space = livingSpace(Maybe(bob))
