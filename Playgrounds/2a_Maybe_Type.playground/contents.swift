@@ -31,9 +31,9 @@ enum Maybe<T> : ExpressibleByNilLiteral {
     case none
     case some(T)
     
-    init() { self = none } // init with no args defaults to 'none'
-    init(_ s: T) { self = some(s) }
-    init(nilLiteral: ()) { self = none } // init with 'nil' defaults to 'none'
+    init() { self = .none } // init with no args defaults to 'none'
+    init(_ s: T) { self = .some(s) }
+    init(nilLiteral: ()) { self = .none } // init with 'nil' defaults to 'none'
 /*:
 *map* takes a normal function from *T -> U* and runs it inside the **Maybe**.
 * If the value of **self** is *.none* the function is not applied and *.none* is returned.
