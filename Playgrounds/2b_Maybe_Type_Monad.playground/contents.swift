@@ -42,7 +42,11 @@ The return value for *map* needs to be explicitly wrapped in a **Maybe** as the 
 
 Compare the implementation of **map** (above) to **>>=** to see how similar they are.
 */
-infix operator >>= { associativity left }
+precedencegroup BindPrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator >>= : BindPrecedence
 func >>= <A,B> (m: Maybe<A>, f: (A) -> Maybe<B>) -> Maybe<B> {
     switch m {
     case .none : return .none
