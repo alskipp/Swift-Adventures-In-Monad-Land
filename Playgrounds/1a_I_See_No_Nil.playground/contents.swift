@@ -152,10 +152,29 @@ Whereas the following is acceptable:
 
 ## Is *nil* less than zero?
 
+Update for Swift 3: this section is no longer relevant in Swift 3 due to [SE-0121 "Remove Optional Comparison Operators"](https://github.com/apple/swift-evolution/blob/master/proposals/0121-remove-optional-comparison-operators.md).
+
+For educational purposes, we assume that there are still implementations of Optional Comparison Operators.
+*/
+func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+	switch (lhs, rhs) {
+	case (.none, .some) : return true
+	case let (.some(x), .some(y)) : return x < y
+	default : return false
+	}
+}
+
+func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+	switch (lhs, rhs) {
+	case (.some, .none) : return true
+	case let (.some(x), .some(y)) : return x > y
+	default : return false
+	}
+}
+/*:
 You might expect **nil** to be equal to zero. Well is it?
 */
 nil < 0
-
 /*:
 **It turns out that *nil* is less than zero. How can this be?**
 
