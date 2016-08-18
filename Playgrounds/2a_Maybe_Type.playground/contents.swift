@@ -13,12 +13,12 @@ This allows a **Maybe** value to be constructed from *nil*.
 One aspect of Swift's **Optional** type which can't be reproduced is
 *implicit Optional wrapping*. Here's an example:
 
-    .none < 0
+    .some(0) == 0
 
 Such a comparison should not be possible as the types don't match.
 However, Swift will automatically convert the expression to:
 
-    .none < .some(0)
+    .some(0) == .some(0)
 
 It's impossible to reproduce the recipe for this secret sauce – it's an
 **Optional** only capability which is often convenient, sometimes bizarre.
@@ -56,37 +56,24 @@ extension Maybe : CustomStringConvertible {
     }
 }
 /*:
-### *Equatable* & *Comparable* protocols
+### *Equatable* protocol
 
-The built in **Optional** type does not conform to the *Equatable* or *Comparable* protocols.
-Conforming to these protocols would prevent non-comparable values from being declared **Optional**.
+The built in **Optional** type does not conform to the *Equatable* protocol.
+Conforming to this protocol would prevent non-equatable values from being declared **Optional**.
 This is what the type restriction would look like:
 
-    enum Optional<T:Comparable> {}
+    enum Optional<T:Equatable> {}
 
-There are however overloaded operators for equality and comparison that accept **Optionals**.
-Below are a few overloaded operators for the **Maybe** type. As we can't conform to *Comparable*
+There is however an overloaded operator for equality that accepts **Optionals**.
+Below is an overloaded equality operator for the **Maybe** type. As we can't conform to *Equatable*
 we don't get any operators for free :(
 */
-
 func == <T: Equatable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
     switch (lhs, rhs) {
     case (.none, .none) : return true
     case let (.some(x), .some(y)) : return x == y
     default : return false
     }
-}
-
-func < <T: Comparable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
-    switch (lhs, rhs) {
-    case (.none, .some) : return true
-    case let (.some(x), .some(y)) : return x < y
-    default : return false
-    }
-}
-
-func > <T: Comparable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
-    return rhs < lhs
 }
 /*:
 ### Usage of Custom *Maybe* Type
@@ -103,12 +90,10 @@ let m2 = m1.map { $0 + 1 }
 print(m2)
 //: Comparing **Maybe** types
 m1 == m2 // Maybe(1) == Maybe(2)
-m1 < m2 // Maybe(1) < Maybe(2)
-m1 > m2 // Maybe(1) > Maybe(2)
 //: *ExpressibleByNilLiteral* in action on custom **Maybe** type
-nil < m1 // ExpressibleByNilLiteral is invoked to contruct a Maybe value from 'nil'
+nil == m1 // ExpressibleByNilLiteral is invoked to contruct a Maybe value from 'nil'
 //: Example of, *implicit Optional wrapping* with **Optionals**
-Optional(1) < 2
+Optional(1) == 1
 /*:
 the equivalent code using **Maybe** will not compile
 
