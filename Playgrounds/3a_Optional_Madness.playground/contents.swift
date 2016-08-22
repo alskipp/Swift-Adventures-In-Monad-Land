@@ -1,6 +1,25 @@
 /*:
 ## When Optionals go Bad!
 
+Update for Swift 3: this section is no longer relevant in Swift 3 due to [SE-0121 "Remove Optional Comparison Operators"](https://github.com/apple/swift-evolution/blob/master/proposals/0121-remove-optional-comparison-operators.md).
+For educational purposes, we assume that there are still implementations of Optional Comparison Operators.
+*/
+func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case (.none, .some) : return true
+    case let (.some(x), .some(y)) : return x < y
+    default : return false
+    }
+}
+
+func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case (.some, .none) : return true
+    case let (.some(x), .some(y)) : return x > y
+    default : return false
+    }
+}
+/*:
 Presented below is an edge case where Optionals behave in such a way as to produce unexpected results.
 
 To demonstrate this, we'll use a **Pet** struct that has one property *age*.
@@ -93,7 +112,7 @@ which is used in case the value of the *second parameter* is **Optional.none**. 
 It is similar to *map* for *Optionals*, but the *default parameter* allows the return value to be a non-optional value.
 */
 
-func maybe<A,B>(_ opt: A?, defaultValue: @autoclosure () -> B, f: @noescape (A) -> B) -> B {
+func maybe<A,B>(_ opt: A?, defaultValue: @autoclosure () -> B, f: (A) -> B) -> B {
     switch opt {
     case .none : return defaultValue()
     case .some(let x) : return f(x)
@@ -170,7 +189,7 @@ A desperate technique to escape from type-checking purgatory could look like thi
 That would work, but it's ugly as hell – which is where we're destined for writing code like that. 
 Thankfully, there's a way to avoid it and it requires the **maybe** function – this time implemented for the **Maybe** type.
 */
-func maybe<A,B>(_ opt: Maybe<A>, defaultValue: @autoclosure () -> B, f: @noescape (A) -> B) -> B {
+func maybe<A,B>(_ opt: Maybe<A>, defaultValue: @autoclosure () -> B, f: (A) -> B) -> B {
     switch opt {
     case .none : return defaultValue()
     case .some(let x) : return f(x)

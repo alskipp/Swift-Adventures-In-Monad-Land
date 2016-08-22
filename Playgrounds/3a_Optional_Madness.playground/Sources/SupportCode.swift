@@ -1,5 +1,5 @@
 
-public func >>= <A,B>(x: A?, f: @noescape (A) -> B?) -> B? {
+public func >>= <A,B>(x: A?, f: (A) -> B?) -> B? {
     switch x {
     case .none : return .none
     case .some(let x) : return f(x)

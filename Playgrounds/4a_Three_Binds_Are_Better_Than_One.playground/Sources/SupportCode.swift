@@ -47,7 +47,11 @@ Apply operator for Optionals:
 Takes an Optional function and an Optional value,
 If both function and value are not nil, then apply the function to the value
 */
-infix operator <*> { associativity left precedence 130 }
+precedencegroup ApplyPrecedence {
+	associativity: left
+	higherThan: ComparisonPrecedence
+}
+infix operator <*> : ApplyPrecedence
 
 public func <*> <A,B>(f:((A) -> B)?, x:A?) -> B? {
   if let f = f, let x = x {
