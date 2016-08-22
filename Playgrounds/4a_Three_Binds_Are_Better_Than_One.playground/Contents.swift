@@ -51,7 +51,11 @@ The pattern matching boiler plate code has been abstracted away inside the magic
 It turns out that *Optional chaining* with **?** is monadic bind that is restricted to methods and subscript operations.
 If we define the bind operator **>>=** for **Optionals**, it's easy to see the similarity.
 */
-infix operator >>= {associativity left}
+precedencegroup BindPrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator >>= : BindPrecedence
 
 func >>= <A,B>(x: A?, f: (A) -> B?) -> B? {
     switch x {
@@ -182,7 +186,7 @@ The first thing to do is to define a **typealias** to represent a JSON dictionar
 using the **JSONFromFile** function.
 */
 typealias JSON = [String:AnyObject]
-let json: AnyObject? = JSONFromFile("person")
+let json: Any? = JSONFromFile("person")
 /*:
 The next task is to parse the JSON data and initialize a **Person**.
 To do so, we can define a function that takes an **Optional<AnyObject>** and returns an **<Optional<Person>**.
@@ -192,7 +196,7 @@ We can then subscript into **j** within the **if let** statement to access the J
 (casting to the correct type as we do so). As later bindings depend upon the previous variable **j**, this is a monadic bind operation.
 Finally, if the **if let** statement succeeds, create and return the **Person** type, otherwise, return **.none**.
 */
-func parseJSON(_ json:AnyObject?) -> Person? {
+func parseJSON(_ json:Any?) -> Person? {
   if let j = json as? JSON,
          let name = j["name"] as? String,
          let job = j["job"] as? String,

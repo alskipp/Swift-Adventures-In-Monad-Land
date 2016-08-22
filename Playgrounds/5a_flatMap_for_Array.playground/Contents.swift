@@ -23,7 +23,11 @@ We can not simply apply the function **A -> Array<B>** to every element of **Arr
 The return type needs to be **Array<B>**. If we use the **map** function, we'd need to somehow flatten the **Array** before returning the result,
 alternatively, we could use a mutable **Array** and update it within a loop, or we could use the **reduce** function, as follows.
 */
-infix operator >>= {associativity left}
+precedencegroup BindPrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator >>= : BindPrecedence
 func >>= <A,B>(x: [A], f: (A) -> [B]) -> [B] {
     return x.reduce([]) { result, item in result + f(item) }
 }

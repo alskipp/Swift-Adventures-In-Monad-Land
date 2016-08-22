@@ -106,8 +106,12 @@ Both the first parameter **Threat<A>** and the return type of the function param
 **ThreatLevel** property. The only logic that needs to be implemented is to ensure that the
 highest **ThreatLevel** is attached to the return value of the bind function.
 */
-infix operator >>= {associativity left}
-func >>= <A,B> (t: Threat<A>, f: @noescape (A) -> Threat<B>) -> Threat<B> {
+precedencegroup BindPrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator >>= : BindPrecedence
+func >>= <A,B> (t: Threat<A>, f: (A) -> Threat<B>) -> Threat<B> {
     let t2 = f(t.value) // apply function f – the type of t2 is Threat<B>
     
     // return a new Threat with the value from t2
@@ -372,7 +376,7 @@ If we were using Haskell, this function would be available to use for any monadi
 Unfortunately it is not (yet) possible to inform Swift's type system that a particular type is monadic,
 which means that we need to manually create the following function for every monadic type : (
 */
-func liftM<A,B>(_ m1: Threat<A>, _ m2: Threat<A>, f: @noescape (A,A) -> B) -> Threat<B> {
+func liftM<A,B>(_ m1: Threat<A>, _ m2: Threat<A>, f: (A,A) -> B) -> Threat<B> {
     return m1 >>= { x in m2 >>= { pure(f(x, $0)) } }
 }
 /*:

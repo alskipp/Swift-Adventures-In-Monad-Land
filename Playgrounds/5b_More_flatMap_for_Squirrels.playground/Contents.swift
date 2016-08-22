@@ -182,7 +182,11 @@ With the introduction of a new *infix operator* the flow of the code will be a l
 The left-hand side of the operator takes a value of type **A**, the right-hand side takes a function of type **A -> B**.
 The *pipe forward operator* simply applies the function to the value:
 */
-infix operator |> {associativity left precedence 95}
+precedencegroup PipePrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator |> : PipePrecedence
 func |> <A,B>(x:A, f:(A) -> B) -> B {
     return f(x)
 }
@@ -248,7 +252,7 @@ Use **first** to take the first element of the supplied **Array**. The return va
 Therefore use **map** on the return value of **first** - if the **Array** is empty the whole expression will return **.none**.
 If the **Array** isn't empty the normal **reduce** function will be called using the first element as the initial value.
 */
-func reduce1<A>(_ f:(A,A) -> A) -> ([A]) -> A? {
+func reduce1<A>(_ f:@escaping (A,A) -> A) -> ([A]) -> A? {
 	return { xs in
 		return xs.first.map { x in
 			xs[xs.indices.suffix(from: 1)].reduce(x, f)
@@ -264,13 +268,13 @@ func reduce1<A>(_ f:(A,A) -> A) -> ([A]) -> A? {
 Using **reduce1** it is now possible to implement **minBy** & **maxBy**.
 The idea is to be able to select the min or max element from an **Array** based upon any property of the elements.
 */
-func minBy<A,B:Comparable>(_ f:(A) -> B) -> ([A]) -> A? {
+func minBy<A,B:Comparable>(_ f:@escaping (A) -> B) -> ([A]) -> A? {
 	return { xs in
 		return xs |> reduce1 { x,y in f(x) < f(y) ? x : y }
 	}
 }
 
-func maxBy<A,B:Comparable>(_ f:(A) -> B) -> ([A]) -> A? {
+func maxBy<A,B:Comparable>(_ f:@escaping (A) -> B) -> ([A]) -> A? {
 	return { xs in
 		return xs |> reduce1 { x,y in f(x) > f(y) ? x : y }
 	}
@@ -329,7 +333,7 @@ All these questions and more can be answered by combining the functions we've cr
 First, let's extend **Squirrel** to be **CustomStringConvertible**.
 The **curry** function below is used to curry the **joinWithSeparator** function when constructing a *description* **String**.
 */
-func curry<A,B,C>(_ f:(A,B) -> C) -> (A) -> (B) -> C {
+func curry<A,B,C>(_ f:@escaping (A,B) -> C) -> (A) -> (B) -> C {
     return { a in { b in f(a,b) } }
 }
 

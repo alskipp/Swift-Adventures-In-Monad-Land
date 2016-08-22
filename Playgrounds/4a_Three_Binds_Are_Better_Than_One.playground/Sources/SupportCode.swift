@@ -1,11 +1,10 @@
 import Foundation
 
-public func JSONFromFile(_ file: String) -> AnyObject? {
-  return Bundle.main.path(forResource: file, ofType: "json").flatMap { p in
-    (try? Data(contentsOf: URL(fileURLWithPath: p))).flatMap { data in
-      try! JSONSerialization.jsonObject(with: data, options: [])
+public func JSONFromFile(_ file: String) -> Any? {
+	return Bundle.main.path(forResource: file, ofType: "json").flatMap { (p: String) -> Any? in
+		let data = try! Data(contentsOf: URL(fileURLWithPath: p))
+		return try! JSONSerialization.jsonObject(with: data, options: [])
     }
-  }
 }
 
 
