@@ -1,7 +1,7 @@
 /*
 nil/Optional is a difficult topic to cover because Xcode's display of Optional types is a big lie.
 Xcode will display Optionals as plain values if they have an associated value 
-and it will display the value as nil if the value of the Optional is .None.
+and it will display the value as nil if the value of the Optional is .none.
 
 Below is a function (optToString) that will convert Optionals to a sensible String value.
 
@@ -15,7 +15,7 @@ Therefore optToString will curiously accept non-optional values as input.
 
 import Foundation
 
-public func optToString<T>(v: T?) -> String {
+public func optToString<T>(_ v: T?) -> String {
 /*
     "\(T.self)" gets the type of the parameter as a String. Examples:
     
@@ -32,26 +32,26 @@ public func optToString<T>(v: T?) -> String {
     Optional("hi")
     Optional([1,2,3])
     
-    Need to replace 'nil' with '.None'
+    Need to replace 'nil' with '.none'
     Need to remove '(' and ')' from the String
     
     ######################################################
 
     Desired String format examples:
     
-    Optional<Int>.None
-    Optional<Array<String>>.None
-    Optional<String>.Some("hi")
-    Optional<Array<Int>>.Some([1,2,3])
+    Optional<Int>.none
+    Optional<Array<String>>.none
+    Optional<String>.some("hi")
+    Optional<Array<Int>>.some([1,2,3])
     
 */
 
-    let type = "\(T.self)".stringByReplacingOccurrencesOfString("Swift.", withString:"")
+    let type = "\(T.self)".replacingOccurrences(of: "Swift.", with:"")
     let value = "\(v.self)"
 
     if value != "nil" {
         let v = value.characters.split { $0 == "(" || $0 == ")" }.map(String.init)
-        return v.joinWithSeparator("<\(type)>.Some(") + ")"
+        return v.joined(separator: "<\(type)>.some(") + ")"
     }
-    return "Optional<\(type)>.None"
+    return "Optional<\(type)>.none"
 }

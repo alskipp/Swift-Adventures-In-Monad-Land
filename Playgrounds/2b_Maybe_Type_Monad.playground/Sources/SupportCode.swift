@@ -1,14 +1,14 @@
-public enum Maybe<T> : NilLiteralConvertible {
-    case None, Some(T)
+public enum Maybe<T> : ExpressibleByNilLiteral {
+    case none, some(T)
     
-    public init() { self = None }
-    public init(_ some: T) { self = Some(some) }
-    public init(nilLiteral: ()) { self = None }
+    public init() { self = .none }
+    public init(_ s: T) { self = .some(s) }
+    public init(nilLiteral: ()) { self = .none }
     
-    func map<U>(f: T -> U) -> Maybe<U> {
+    func map<U>(_ f: (T) -> U) -> Maybe<U> {
         switch self {
-        case .None : return .None
-        case .Some(let x) : return .Some(f(x))
+        case .none : return .none
+        case .some(let x) : return .some(f(x))
         }
     }
 }
@@ -16,24 +16,24 @@ public enum Maybe<T> : NilLiteralConvertible {
 extension Maybe : CustomStringConvertible {
     public var description: String {
         switch self {
-        case .None : return "{None}"
-        case .Some(let x) : return "{Some \(x)}"
+        case .none : return "{none}"
+        case .some(let x) : return "{some \(x)}"
         }
     }
 }
 
 public func == <T: Equatable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
     switch (lhs, rhs) {
-    case (.None, .None) : return true
-    case let (.Some(x), .Some(y)) : return x == y
+    case (.none, .none) : return true
+    case let (.some(x), .some(y)) : return x == y
     default : return false
     }
 }
 
 public func < <T: Comparable>(lhs: Maybe<T>, rhs: Maybe<T>) -> Bool {
     switch (lhs, rhs) {
-    case (.None, .Some) : return true
-    case let (.Some(x), .Some(y)) : return x < y
+    case (.none, .some) : return true
+    case let (.some(x), .some(y)) : return x < y
     default : return false
     }
 }

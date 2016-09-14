@@ -1,7 +1,7 @@
 /*:
 ## Let's go bananas
 
-*NilLiteralConvertible* is not just for **Optionals**.
+*ExpressibleByNilLiteral* is not just for **Optionals**.
 However, having said that, you need a very good reason to adopt the protocol.
 A fruity cautionary tale is presented below.
 
@@ -18,12 +18,12 @@ extension 🍌 : CustomStringConvertible {
     var description: String { return "🍌" } // these bananas are all identical
 }
 /*:
-With a little help from *NilLiteralConvertible*, we can introduce some danger.
+With a little help from *ExpressibleByNilLiteral*, we can introduce some danger.
 For convenience a plain *init()* method will also be added, enabling a **Banana** to be created with 🍌()
 */
-extension 🍌 : NilLiteralConvertible {
-    init() { self = 🍌 }
-    init(nilLiteral: ()) { self = 🍌 }
+extension 🍌 : ExpressibleByNilLiteral {
+    init() { self = .🍌 }
+    init(nilLiteral: ()) { self = .🍌 }
 }
 //: Let's create a **Banana** – nothing too interesting yet
 let b = 🍌()
@@ -70,7 +70,7 @@ print(bananaBox)
 ## **Now that's magic!**
 
 Well, it isn't actually. It's quite obvious when you think about it.
-**Banana** is *NilLiteralConvertible*, therefore, Swift will happily replace all instances of **nil**
+**Banana** is *ExpressibleByNilLiteral*, therefore, Swift will happily replace all instances of **nil**
 with a **Banana**, as long as the type checker is satisfied. You can't, for example, assign **nil**
 to a variable without type annotations and expect it to become a **Banana**:
 

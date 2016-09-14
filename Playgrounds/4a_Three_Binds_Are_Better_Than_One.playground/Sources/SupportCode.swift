@@ -1,11 +1,10 @@
 import Foundation
 
-public func JSONFromFile(file: String) -> AnyObject? {
-  return NSBundle.mainBundle().pathForResource(file, ofType: "json").flatMap { p in
-    NSData(contentsOfFile: p).flatMap { data in
-      try! NSJSONSerialization.JSONObjectWithData(data, options: [])
+public func JSONFromFile(_ file: String) -> Any? {
+	return Bundle.main.path(forResource: file, ofType: "json").flatMap { (p: String) -> Any? in
+		let data = try! Data(contentsOf: URL(fileURLWithPath: p))
+		return try! JSONSerialization.jsonObject(with: data, options: [])
     }
-  }
 }
 
 
@@ -29,9 +28,16 @@ public struct Person: CustomStringConvertible {
 /*
 A curried constructor function to use with the <*> operator. See below.
 */
+public typealias Name = String
+public typealias Job = String
+public typealias BirthYear = Int
 extension Person {
-  public static func create(name:String)(job:String)(birthYear:Int) -> Person {
-    return Person(name:name, job:job, birthYear:birthYear)
+  public static func create(_ name:Name) -> (Job) -> (BirthYear) -> Person {
+	return { job in
+		return { birthYear in
+			return Person(name:name, job:job, birthYear:birthYear)
+		}
+	}
   }
 }
 
@@ -40,11 +46,15 @@ Apply operator for Optionals:
 Takes an Optional function and an Optional value,
 If both function and value are not nil, then apply the function to the value
 */
-infix operator <*> { associativity left precedence 130 }
+precedencegroup ApplyPrecedence {
+	associativity: left
+	higherThan: ComparisonPrecedence
+}
+infix operator <*> : ApplyPrecedence
 
-public func <*> <A,B>(f:(A -> B)?, x:A?) -> B? {
-  if let f = f, x = x {
+public func <*> <A,B>(f:((A) -> B)?, x:A?) -> B? {
+  if let f = f, let x = x {
     return f(x)
   }
-  return .None
+  return .none
 }

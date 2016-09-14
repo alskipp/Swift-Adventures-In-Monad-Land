@@ -1,7 +1,7 @@
 /*: 
 ## Threatening Monad
 
-Previous installments have focussed on **nil**, **NilLiteralConvertible**, **Optionals** and custom **Maybe** types.
+Previous installments have focussed on **nil**, **ExpressibleByNilLiteral**, **Optionals** and custom **Maybe** types.
 This time let's step away from the tentative world of **Optionals** and take a look at a different beast.
 
 The **Threat** monad!
@@ -18,15 +18,15 @@ An **enum** that represents the various threat levels.
 It has an **Int** rawValue to make it easy to implement the **Comparable** protocol.
 */
 enum ThreatLevel : Int, CustomStringConvertible {
-    case Low = 0, Guarded, Elevated, High, Severe
+    case low = 0, guarded, elevated, high, severe
     
     var description: String {
         switch self {
-        case Low :      return "Low"
-        case Guarded :  return "Guarded"
-        case Elevated : return "Elevated"
-        case High :     return "High"
-        case Severe :   return "Severe"
+        case .low :      return "Low"
+        case .guarded :  return "Guarded"
+        case .elevated : return "Elevated"
+        case .high :     return "High"
+        case .severe :   return "Severe"
         }
     }
 }
@@ -68,12 +68,12 @@ struct Threat<T> : CustomStringConvertible {
     }
 }
 //: **map** - makes it possible to apply functions to the value inside the **Threat** struct
-func map<A,B>(x: Threat<A>, f: A -> B) -> Threat<B> {
+func map<A,B>(_ x: Threat<A>, f: (A) -> B) -> Threat<B> {
     return Threat(x.threat, f(x.value))
 }
 //: **Monadic 'return'** - default level is **Low**
-func pure<T>(x: T) -> Threat<T> {
-    return Threat(.Low, x)
+func pure<T>(_ x: T) -> Threat<T> {
+    return Threat(.low, x)
 }
 /*:
 ### **Bind operator for Threat struct**
@@ -106,8 +106,12 @@ Both the first parameter **Threat<A>** and the return type of the function param
 **ThreatLevel** property. The only logic that needs to be implemented is to ensure that the
 highest **ThreatLevel** is attached to the return value of the bind function.
 */
-infix operator >>= {associativity left}
-func >>= <A,B> (t: Threat<A>, @noescape f: A -> Threat<B>) -> Threat<B> {
+precedencegroup BindPrecedence {
+	associativity: left
+	higherThan: AssignmentPrecedence
+}
+infix operator >>= : BindPrecedence
+func >>= <A,B> (t: Threat<A>, f: (A) -> Threat<B>) -> Threat<B> {
     let t2 = f(t.value) // apply function f – the type of t2 is Threat<B>
     
     // return a new Threat with the value from t2
@@ -117,7 +121,7 @@ func >>= <A,B> (t: Threat<A>, @noescape f: A -> Threat<B>) -> Threat<B> {
 /*:
 **A simple example of Threat struct** – Make a dangerous number
 */
-let n = Threat(.High, 666)
+let n = Threat(.high, 666)
 print(n)
 
 //:**Apply a function to the dangerous number** – the **ThreatLevel** is preserved
@@ -148,7 +152,7 @@ struct Person : CustomStringConvertible {
     let occupation: String
     let threat: ThreatLevel
     
-    init(name: String, occupation: String, threat: ThreatLevel = .Low) {
+    init(name: String, occupation: String, threat: ThreatLevel = .low) {
         self.name = name
         self.occupation = occupation
         self.threat = threat
@@ -193,8 +197,10 @@ A **Threat<[Person]>** struct needs to be intialized with two parameters, a **Th
 The first parameter is taken directly from the supplied **Person** by accessing their **threat** property 
 and the second parameter is the result of adding the **Person** to the supplied **Array**.
 */
-func addPerson(person: Person)(_ list: [Person]) -> Threat<[Person]> {
-    return Threat(person.threat, list + [person])
+func addPerson(_ person: Person) -> ([Person]) -> Threat<[Person]> {
+	return { list in
+		return Threat(person.threat, list + [person])
+	}
 }
 /*:
 The only unusual thing about the above function is that it is defined to be explicitly **curried**.
@@ -233,7 +239,7 @@ Quite simply call the function with the first parameter (**Person**),
 (the return value will be a new function expecting an **Array**). Pass an empty **Array**.
 The return value of the expression will be **Threat<[Person]>**.
 */
-let mediumRisk = addPerson(Person(name: "Bob", occupation: "Wrestler", threat: .Elevated))([])
+let mediumRisk = addPerson(Person(name: "Bob", occupation: "Wrestler", threat: .elevated))([])
 print(mediumRisk)
 
 /*:
@@ -248,7 +254,7 @@ and passing it as the second argument to the **addPerson** function.
 
 This time we'll add a less dangerous **Person** to the list, an Artist with a **Low ThreatLevel**.
 */
-let mellow = addPerson(Person(name: "Jeff", occupation: "Artist", threat: .Low))(mediumRisk.value)
+let mellow = addPerson(Person(name: "Jeff", occupation: "Artist", threat: .low))(mediumRisk.value)
 print(mellow)
 
 /*:
@@ -265,7 +271,7 @@ is preserved when returning the new value.
 
 #### **Adding a *Person* to a pre-populated list – *the correct way***
 */
-let correct = mediumRisk >>= addPerson(Person(name: "Jeff", occupation: "Artist", threat: .Low))
+let correct = mediumRisk >>= addPerson(Person(name: "Jeff", occupation: "Artist", threat: .low))
 print(correct)
 
 /*:
@@ -301,7 +307,7 @@ print(safeGroup)
 /*:
 Now let's add a dubious character to the safeGroup to see what the result is:
 */
-let dodgy = safeGroup >>= addPerson(Person(name: "Gideon", occupation: "MP", threat: .Elevated))
+let dodgy = safeGroup >>= addPerson(Person(name: "Gideon", occupation: "MP", threat: .elevated))
 print(dodgy)
 
 /*:
@@ -314,10 +320,10 @@ Below, we create a mixed group of people with varying **ThreatLevels**,
 the **ThreatLevel** of the entire group matches the highest **ThreatLevel** of the individual people – 
 it doesn't matter what order the people are added to the group.
 */
-let dangerGroup = addPerson(Person(name: "Jean", occupation: "Thief", threat: .Guarded))([])
-              >>= addPerson(Person(name: "Lucy", occupation: "Juggler", threat: .Severe))
-              >>= addPerson(Person(name: "Beth", occupation: "PsychoKiller", threat: .High))
-              >>= addPerson(Person(name: "Ada", occupation: "Programmer")) // threat: .Low
+let dangerGroup = addPerson(Person(name: "Jean", occupation: "Thief", threat: .guarded))([])
+              >>= addPerson(Person(name: "Lucy", occupation: "Juggler", threat: .severe))
+              >>= addPerson(Person(name: "Beth", occupation: "PsychoKiller", threat: .high))
+              >>= addPerson(Person(name: "Ada", occupation: "Programmer")) // threat: .low
 
 print(dangerGroup)
 
@@ -370,7 +376,7 @@ If we were using Haskell, this function would be available to use for any monadi
 Unfortunately it is not (yet) possible to inform Swift's type system that a particular type is monadic,
 which means that we need to manually create the following function for every monadic type : (
 */
-func liftM<A,B>(m1: Threat<A>, _ m2: Threat<A>, @noescape f: (A,A) -> B) -> Threat<B> {
+func liftM<A,B>(_ m1: Threat<A>, _ m2: Threat<A>, f: (A,A) -> B) -> Threat<B> {
     return m1 >>= { x in m2 >>= { pure(f(x, $0)) } }
 }
 /*:

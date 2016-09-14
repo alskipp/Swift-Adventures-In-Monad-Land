@@ -1,6 +1,25 @@
 /*:
 ## When Optionals go Bad!
 
+Update for Swift 3: this section is no longer relevant in Swift 3 due to [SE-0121 "Remove Optional Comparison Operators"](https://github.com/apple/swift-evolution/blob/master/proposals/0121-remove-optional-comparison-operators.md).
+For educational purposes, we assume that there are still implementations of Optional Comparison Operators.
+*/
+func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case (.none, .some) : return true
+    case let (.some(x), .some(y)) : return x < y
+    default : return false
+    }
+}
+
+func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+    switch (lhs, rhs) {
+    case (.some, .none) : return true
+    case let (.some(x), .some(y)) : return x > y
+    default : return false
+    }
+}
+/*:
 Presented below is an edge case where Optionals behave in such a way as to produce unexpected results.
 
 To demonstrate this, we'll use a **Pet** struct that has one property *age*.
@@ -30,7 +49,7 @@ All people have a name and they may, or may not own a **Pet**
 */
 let peeps = [Person(name: "Fred", pet: Pet(age: 10)),
              Person(name: "Jane", pet: Pet(age: 1)),
-             Person(name: "Eric", pet: .None)]
+             Person(name: "Eric", pet: .none)]
 
 /*:
 **The Problem**
@@ -63,9 +82,9 @@ Otherwise the types won't match; Swift *helpfully* wraps the **4** in an **Optio
 
 When *Eric* is filtered, the *types* and *values* of the expression are as follows:
 
-    Optional<Int>.None < Optional<Int>.Some(4)
+    Optional<Int>.none < Optional<Int>.some(4)
 
-**.None** is always less than **.Some**, therefore the expression returns *true*.
+**.none** is always less than **.some**, therefore the expression returns *true*.
 
 * * *
 
@@ -77,7 +96,7 @@ The code isn't as succinct, or as clear as the previous version, but, it does re
 */
 
 let p2 = peeps.filter {
-    if let p = $0.pet where p.age < 4 {
+    if let p = $0.pet, p.age < 4 {
         return true
     }
     return false
@@ -88,15 +107,15 @@ print(p2)
 **Another Alternative**
 
 The **maybe** function is taken from *Haskell*. The *first parameter* to the function is the default value
-which is used in case the value of the *second parameter* is **Optional.None**. The *third parameter* is the function to be applied.
+which is used in case the value of the *second parameter* is **Optional.none**. The *third parameter* is the function to be applied.
 
 It is similar to *map* for *Optionals*, but the *default parameter* allows the return value to be a non-optional value.
 */
 
-func maybe<A,B>(opt: A?, @autoclosure defaultValue: () -> B, @noescape f: A -> B) -> B {
+func maybe<A,B>(_ opt: A?, defaultValue: @autoclosure () -> B, f: (A) -> B) -> B {
     switch opt {
-    case .None : return defaultValue()
-    case .Some(let x) : return f(x)
+    case .none : return defaultValue()
+    case .some(let x) : return f(x)
     }
 }
 
@@ -115,7 +134,7 @@ print(p3)
 
 The next approach uses both *map* on **Optional** and the *nil coalescing operator*.
 It does exactly the same thing as the **maybe** function, however it's pretty difficult to read.
-The return value of *map* is *Optional<Bool>.None* when the *Pet* is *.None*.
+The return value of *map* is *Optional<Bool>.none* when the *Pet* is *.none*.
 The *nil coalescing operator* **??** unwraps the **Optional** value and returns it –
 if there's no associated value to unwrap, it returns the default value, in this case *'false'*.
 */
@@ -139,7 +158,7 @@ struct Person2 {
 extension Person2 : CustomStringConvertible {
     var description : String {
         switch pet {
-        case .Some(let p) : return "\(name) has a Pet aged: \(p.age)"
+        case .some(let p) : return "\(name) has a Pet aged: \(p.age)"
         default : return "\(name) has no pet"
         }
     }
@@ -147,7 +166,7 @@ extension Person2 : CustomStringConvertible {
 //: create an array of people, this time with **Maybe<Pet>** properties
 let peeps2 = [Person2(name: "Fred", pet: Maybe(Pet(age: 10))),
               Person2(name: "Jane", pet: Maybe(Pet(age: 1))),
-              Person2(name: "Eric", pet: .None)]
+              Person2(name: "Eric", pet: .none)]
 /*:
 A first attempt at filtering the Array might be as follows:
 
@@ -162,18 +181,18 @@ The reason is because the return type of the closure passed to filter is incorre
 A desperate technique to escape from type-checking purgatory could look like this:
 
     peeps2.filter { switch $0.pet {
-        case .Some(let pet) : return pet.age < 4
-        case .None : return false
+        case .some(let pet) : return pet.age < 4
+        case .none : return false
         }
     }
 
 That would work, but it's ugly as hell – which is where we're destined for writing code like that. 
 Thankfully, there's a way to avoid it and it requires the **maybe** function – this time implemented for the **Maybe** type.
 */
-func maybe<A,B>(opt: Maybe<A>, @autoclosure defaultValue: () -> B, @noescape f: A -> B) -> B {
+func maybe<A,B>(_ opt: Maybe<A>, defaultValue: @autoclosure () -> B, f: (A) -> B) -> B {
     switch opt {
-    case .None : return defaultValue()
-    case .Some(let x) : return f(x)
+    case .none : return defaultValue()
+    case .some(let x) : return f(x)
     }
 }
 //: By using the **maybe** function, the filter expression can be implemented in a reasonably sane fashion:
