@@ -85,7 +85,7 @@ to a variable without type annotations and expect it to become a **Banana**:
 
 So, what was the point of this curious incident with *self-generating-Swift-Bananas?*
 It was to show that **nil** and **Optionals** are not synonymous concepts.
-**nil** can become any type of value (if the type is *NilLieralConvertible), in practice
+**nil** can become any type of value (if the type is *ExpressibleByNilLiteral*), in practice
 the **nils** in your program will become **Optionals**, if they become **Bananas**, you're
 doing something terribly wrong.
 
