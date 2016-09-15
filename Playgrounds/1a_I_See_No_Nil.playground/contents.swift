@@ -152,9 +152,9 @@ Whereas the following is acceptable:
 
 ## Is *nil* less than zero?
 
-Update for Swift 3: this section is no longer relevant in Swift 3 due to [SE-0121 "Remove Optional Comparison Operators"](https://github.com/apple/swift-evolution/blob/master/proposals/0121-remove-optional-comparison-operators.md).
+Update for Swift 3: this section is no longer relevant in Swift 3 due to [SE-0121 "Remove Optional Comparison Operators"](https://github.com/apple/swift-evolution/blob/master/proposals/0121-remove-optional-comparison-operators.md). Incidentally the proposal references code in `Optional Madness` (part 3 of this series). My intention wasn't to argue against Optional implementing `comparison operators`, but to reveal the confusion potentially caused by `automatic Optional lifting` (it's not always clear when you're dealing with an Optional). But we're getting ahead of ourselves now. All will be revealed eventually.
 
-For educational purposes, we assume that there are still implementations of Optional Comparison Operators.
+For educational purposes, we assume that there are still implementations of Optional Comparison Operators as it allows us to explore the inner workings of Optionals and some of the Swift compiler's secret sauce for dealing with Optionals.
 */
 func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 	switch (lhs, rhs) {
